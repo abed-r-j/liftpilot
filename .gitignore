@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Data: raw files are downloaded by `liftpilot download` and are never committed
+data/raw/
+data/interim/
+data/cache/
+data/suppression_list.txt
+
+# Model artifacts are rebuilt by `liftpilot train`; the small JSON reports are kept
+artifacts/*/customers.parquet
+artifacts/*/models.joblib
+
+# Agent runs (audience exports, audit log)
+runs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

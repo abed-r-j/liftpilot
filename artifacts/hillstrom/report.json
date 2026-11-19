@@ -1,0 +1,648 @@
+{
+  "dataset": {
+    "name": "hillstrom",
+    "description": "Hillstrom MineThatData (2008): randomised e-mail campaign of an online retailer; outcome = visit within two weeks; revenue = observed spend.",
+    "currency": "USD",
+    "customers_total": 64000,
+    "customers_in_experiment": 64000,
+    "treated_share": 0.66709375,
+    "conversion_treated": 0.16704923408441466,
+    "conversion_control": 0.10616727682343002,
+    "splits": {
+      "train": 38400,
+      "calibration": 12800,
+      "test": 12800
+    },
+    "n_features": 9,
+    "revenue_observed": true,
+    "mean_value": 7.290384956537166,
+    "source": "http://www.minethatdata.com/Kevin_Hillstrom_MineThatData_E-MailAnalytics_DataMiningChallenge_2008.03.20.csv",
+    "outcome": "visit",
+    "arms": "any e-mail vs no e-mail"
+  },
+  "economics": {
+    "margin": 0.4,
+    "contact_cost": 0.1,
+    "discount": 0.0,
+    "currency": "USD"
+  },
+  "seed": 0,
+  "experiment_readout": {
+    "rate_treated": 0.16704923408441466,
+    "rate_control": 0.10616727682343002,
+    "ate": 0.06088195726098464,
+    "relative_uplift": 0.5734531305935184,
+    "se": 0.002777287642805201,
+    "ci_low": 0.055438473481086444,
+    "ci_high": 0.06632544104088284,
+    "z": 21.921372609245037,
+    "p_value": 0.0,
+    "n_treated": 42694.0,
+    "n_control": 21306.0
+  },
+  "learners": {
+    "response": {
+      "fit_seconds": 0.4,
+      "qini_calibration": -0.00871994856816781,
+      "qini_test": {
+        "value": 0.021674547532464755,
+        "ci_low": -0.009772032857952443,
+        "ci_high": 0.052680410054505,
+        "se": 0.015203794004981633
+      },
+      "auuc_test": 0.033204596821550546,
+      "uplift_at_10": 0.06572009014309663,
+      "uplift_at_30": 0.07543108356403103,
+      "uplift_bottom_30": 0.05288322772438806
+    },
+    "s_learner": {
+      "fit_seconds": 0.53,
+      "qini_calibration": 0.014087290589172638,
+      "qini_test": {
+        "value": 0.04261350154085315,
+        "ci_low": 0.013638467095767605,
+        "ci_high": 0.0728827944511874,
+        "se": 0.015621138861239881
+      },
+      "auuc_test": 0.035856468373580114,
+      "uplift_at_10": 0.0984244926040592,
+      "uplift_at_30": 0.08937110562575173,
+      "uplift_bottom_30": 0.045463333657619884
+    },
+    "t_learner": {
+      "fit_seconds": 0.68,
+      "qini_calibration": 0.008712564248229795,
+      "qini_test": {
+        "value": 0.020065468799685574,
+        "ci_low": -0.0070663860667416045,
+        "ci_high": 0.04686376200906232,
+        "se": 0.015081352151755312
+      },
+      "auuc_test": 0.03302658644036037,
+      "uplift_at_10": 0.07196969696969696,
+      "uplift_at_30": 0.07678134990062296,
+      "uplift_bottom_30": 0.0487720719320764
+    },
+    "x_learner": {
+      "fit_seconds": 1.48,
+      "qini_calibration": 0.010905578395910257,
+      "qini_test": {
+        "value": 0.016237507168654564,
+        "ci_low": -0.012602726867477348,
+        "ci_high": 0.04494717958343814,
+        "se": 0.015087121994591826
+      },
+      "auuc_test": 0.032600917732614115,
+      "uplift_at_10": 0.0854497547135718,
+      "uplift_at_30": 0.07424320682992686,
+      "uplift_bottom_30": 0.055604195166438664
+    },
+    "dr_learner": {
+      "fit_seconds": 2.6,
+      "qini_calibration": 0.01576573824337003,
+      "qini_test": {
+        "value": 0.022921474920957235,
+        "ci_low": -0.002654742693017154,
+        "ci_high": 0.05510473162561006,
+        "se": 0.015328322724934097
+      },
+      "auuc_test": 0.03335133908071663,
+      "uplift_at_10": 0.06071135430916555,
+      "uplift_at_30": 0.06955576812422806,
+      "uplift_bottom_30": 0.045232422064332256
+    },
+    "class_transformation": {
+      "fit_seconds": 0.49,
+      "qini_calibration": 0.012080103593194813,
+      "qini_test": {
+        "value": 0.03102681754474999,
+        "ci_low": 0.0014275552688031966,
+        "ci_high": 0.059934489116276815,
+        "se": 0.015577961389365819
+      },
+      "auuc_test": 0.03429241170152502,
+      "uplift_at_10": 0.08162213154315301,
+      "uplift_at_30": 0.07257237613513157,
+      "uplift_bottom_30": 0.02917288152628375
+    },
+    "ensemble": {
+      "fit_seconds": 2.13,
+      "qini_calibration": 0.014414321216277596,
+      "qini_test": {
+        "value": 0.030791057890725535,
+        "ci_low": 0.001132971604951957,
+        "ci_high": 0.05996474779205895,
+        "se": 0.015557627391118578
+      },
+      "auuc_test": 0.034353638418551574,
+      "uplift_at_10": 0.08241758241758243,
+      "uplift_at_30": 0.07704427810752199,
+      "uplift_bottom_30": 0.031240614356890767
+    }
+  },
+  "learners_repeated": {
+    "response": {
+      "mean": 0.012464228778199405,
+      "sd": 0.017085950365373782,
+      "runs": 5
+    },
+    "s_learner": {
+      "mean": 0.02432084193337718,
+      "sd": 0.02099862218805037,
+      "runs": 5
+    },
+    "t_learner": {
+      "mean": 0.011154093782360108,
+      "sd": 0.021776108939929113,
+      "runs": 5
+    },
+    "x_learner": {
+      "mean": 0.01309697040002678,
+      "sd": 0.020736805189362703,
+      "runs": 5
+    },
+    "dr_learner": {
+      "mean": 0.011129377773981897,
+      "sd": 0.02619602511732891,
+      "runs": 5
+    },
+    "class_transformation": {
+      "mean": -0.003180280743052953,
+      "sd": 0.02269718563411265,
+      "runs": 5
+    },
+    "ensemble": {
+      "mean": 0.011806169468950179,
+      "sd": 0.025445663911242374,
+      "runs": 5
+    }
+  },
+  "champion": "dr_learner",
+  "calibration": {
+    "informative": true,
+    "bin_score": [
+      -0.028888746722263436,
+      0.0008293545215803378,
+      0.013492041490312473,
+      0.021616625006280792,
+      0.028361530214362864,
+      0.034361744550032824,
+      0.04013776709587326,
+      0.04605705472590599,
+      0.05195008007742354,
+      0.057010732346544614,
+      0.06214266516296627,
+      0.0672047256863387,
+      0.07221152001264303,
+      0.07783274872027349,
+      0.0834348360896661,
+      0.08976093773872655,
+      0.09732667023357701,
+      0.10787971929857579,
+      0.12428211999108825,
+      0.15847455126077764
+    ],
+    "bin_uplift_observed": [
+      0.0749965333703107,
+      0.04658552407340216,
+      0.03954876801794373,
+      0.0536662598542072,
+      0.0602592388306674,
+      0.01984583100462929,
+      0.057433689170452384,
+      0.07846940574854522,
+      0.06688819566888195,
+      0.05437744847555784,
+      0.07264673311184938,
+      0.04909015853889838,
+      0.08899982011153085,
+      0.07110342840679919,
+      0.047495017452099,
+      0.04195885311765141,
+      0.05145183660686323,
+      0.10279339034703842,
+      0.05994505234238076,
+      0.08055811504541266
+    ],
+    "bin_uplift_fitted": [
+      0.0490573101841743,
+      0.0490573101841743,
+      0.0490573101841743,
+      0.0490573101841743,
+      0.0490573101841743,
+      0.0490573101841743,
+      0.057433689170452384,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.06250319180907198,
+      0.08279852664703949,
+      0.08279852664703949,
+      0.08279852664703949
+    ]
+  },
+  "scale_to_base": 5.0,
+  "policies": {
+    "Contact everyone": {
+      "name": "Contact everyone",
+      "n_customers": 12800,
+      "n_selected": 12800,
+      "share_selected": 1.0,
+      "incremental_conversions": 3898.885901947905,
+      "incremental_revenue": 49150.19672318669,
+      "spend": 6400.0,
+      "incremental_profit": 13260.078689274684,
+      "profit_ci_low": 1174.3558723274718,
+      "profit_ci_high": 23769.742560752016,
+      "prob_profit_positive": 0.9833333333333333,
+      "incremental_roas": 7.67971823799792,
+      "incremental_roi": 2.0718872951991694,
+      "cost_per_incremental_conversion": 1.641494560485221
+    },
+    "Random, same size": {
+      "name": "Random, same size",
+      "n_customers": 12800,
+      "n_selected": 12800,
+      "share_selected": 1.0,
+      "incremental_conversions": 3898.885901947905,
+      "incremental_revenue": 49150.19672318669,
+      "spend": 6400.0,
+      "incremental_profit": 13260.078689274684,
+      "profit_ci_low": 1174.3558723274718,
+      "profit_ci_high": 23769.742560752016,
+      "prob_profit_positive": 0.9833333333333333,
+      "incremental_roas": 7.67971823799792,
+      "incremental_roi": 2.0718872951991694,
+      "cost_per_incremental_conversion": 1.641494560485221
+    },
+    "Response model, same size": {
+      "name": "Response model, same size",
+      "n_customers": 12800,
+      "n_selected": 12800,
+      "share_selected": 1.0,
+      "incremental_conversions": 3898.885901947905,
+      "incremental_revenue": 49150.19672318669,
+      "spend": 6400.0,
+      "incremental_profit": 13260.078689274684,
+      "profit_ci_low": 1174.3558723274718,
+      "profit_ci_high": 23769.742560752016,
+      "prob_profit_positive": 0.9833333333333333,
+      "incremental_roas": 7.67971823799792,
+      "incremental_roi": 2.0718872951991694,
+      "cost_per_incremental_conversion": 1.641494560485221
+    },
+    "Uplift ranking (dr_learner), same size": {
+      "name": "Uplift ranking (dr_learner), same size",
+      "n_customers": 12800,
+      "n_selected": 12800,
+      "share_selected": 1.0,
+      "incremental_conversions": 3898.885901947905,
+      "incremental_revenue": 49150.19672318669,
+      "spend": 6400.0,
+      "incremental_profit": 13260.078689274684,
+      "profit_ci_low": 1174.3558723274718,
+      "profit_ci_high": 23769.742560752016,
+      "prob_profit_positive": 0.9833333333333333,
+      "incremental_roas": 7.67971823799792,
+      "incremental_roi": 2.0718872951991694,
+      "cost_per_incremental_conversion": 1.641494560485221
+    },
+    "LiftPilot profit rule": {
+      "name": "LiftPilot profit rule",
+      "n_customers": 12800,
+      "n_selected": 12800,
+      "share_selected": 1.0,
+      "incremental_conversions": 3898.885901947905,
+      "incremental_revenue": 49150.19672318669,
+      "spend": 6400.0,
+      "incremental_profit": 13260.078689274684,
+      "profit_ci_low": 1174.3558723274718,
+      "profit_ci_high": 23769.742560752016,
+      "prob_profit_positive": 0.9833333333333333,
+      "incremental_roas": 7.67971823799792,
+      "incremental_roi": 2.0718872951991694,
+      "cost_per_incremental_conversion": 1.641494560485221
+    }
+  },
+  "plan_expected": {
+    "customers_total": 12800,
+    "customers_eligible": 12800,
+    "customers_selected": 12800,
+    "share_selected": 1.0,
+    "expected_spend": 1280.0,
+    "expected_incremental_profit": 1007.991285986192,
+    "expected_incremental_roi": 0.7874931921767125,
+    "budget": null,
+    "budget_left": null
+  },
+  "liftpilot_vs_everyone": {
+    "difference": 0.0,
+    "ci_low": 0.0,
+    "ci_high": 0.0,
+    "prob_a_better": 0.0
+  },
+  "scenarios": {
+    "A. E-mail (0.10 USD all-in)": {
+      "economics": {
+        "margin": 0.4,
+        "contact_cost": 0.1,
+        "discount": 0.0,
+        "currency": "USD"
+      },
+      "mean_break_even_uplift": 0.034291741998593535,
+      "policies": {
+        "Contact everyone": {
+          "name": "Contact everyone",
+          "n_customers": 12800,
+          "n_selected": 12800,
+          "share_selected": 1.0,
+          "incremental_conversions": 3898.885901947905,
+          "incremental_revenue": 49150.19672318669,
+          "spend": 6400.0,
+          "incremental_profit": 13260.078689274684,
+          "profit_ci_low": 1174.3558723274718,
+          "profit_ci_high": 23769.742560752016,
+          "prob_profit_positive": 0.9833333333333333,
+          "incremental_roas": 7.67971823799792,
+          "incremental_roi": 2.0718872951991694,
+          "cost_per_incremental_conversion": 1.641494560485221
+        },
+        "Response model, same size": {
+          "name": "Response model, same size",
+          "n_customers": 12800,
+          "n_selected": 12800,
+          "share_selected": 1.0,
+          "incremental_conversions": 3898.885901947905,
+          "incremental_revenue": 49150.19672318669,
+          "spend": 6400.0,
+          "incremental_profit": 13260.078689274684,
+          "profit_ci_low": 1174.3558723274718,
+          "profit_ci_high": 23769.742560752016,
+          "prob_profit_positive": 0.9833333333333333,
+          "incremental_roas": 7.67971823799792,
+          "incremental_roi": 2.0718872951991694,
+          "cost_per_incremental_conversion": 1.641494560485221
+        },
+        "LiftPilot profit rule": {
+          "name": "LiftPilot profit rule",
+          "n_customers": 12800,
+          "n_selected": 12800,
+          "share_selected": 1.0,
+          "incremental_conversions": 3898.885901947905,
+          "incremental_revenue": 49150.19672318669,
+          "spend": 6400.0,
+          "incremental_profit": 13260.078689274684,
+          "profit_ci_low": 1174.3558723274718,
+          "profit_ci_high": 23769.742560752016,
+          "prob_profit_positive": 0.9833333333333333,
+          "incremental_roas": 7.67971823799792,
+          "incremental_roi": 2.0718872951991694,
+          "cost_per_incremental_conversion": 1.641494560485221
+        }
+      },
+      "liftpilot_vs_everyone": {
+        "difference": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0,
+        "prob_a_better": 0.0
+      }
+    },
+    "B. Printed mailer (0.60 USD)": {
+      "economics": {
+        "margin": 0.4,
+        "contact_cost": 0.6,
+        "discount": 0.0,
+        "currency": "USD"
+      },
+      "mean_break_even_uplift": 0.20575045199156114,
+      "policies": {
+        "Contact everyone": {
+          "name": "Contact everyone",
+          "n_customers": 12800,
+          "n_selected": 12800,
+          "share_selected": 1.0,
+          "incremental_conversions": 3898.885901947905,
+          "incremental_revenue": 49150.19672318669,
+          "spend": 38400.0,
+          "incremental_profit": -18739.92131072531,
+          "profit_ci_low": -30825.644127672524,
+          "profit_ci_high": -8230.257439247978,
+          "prob_profit_positive": 0.0,
+          "incremental_roas": 1.2799530396663201,
+          "incremental_roi": -0.4880187841334716,
+          "cost_per_incremental_conversion": 9.848967362911326
+        },
+        "Response model, same size": {
+          "name": "Response model, same size",
+          "n_customers": 12800,
+          "n_selected": 0,
+          "share_selected": 0.0,
+          "incremental_conversions": 0.0,
+          "incremental_revenue": 0.0,
+          "spend": 0.0,
+          "incremental_profit": 0.0,
+          "profit_ci_low": 0.0,
+          "profit_ci_high": 0.0,
+          "prob_profit_positive": 0.0,
+          "incremental_roas": null,
+          "incremental_roi": null,
+          "cost_per_incremental_conversion": null
+        },
+        "LiftPilot profit rule": {
+          "name": "LiftPilot profit rule",
+          "n_customers": 12800,
+          "n_selected": 0,
+          "share_selected": 0.0,
+          "incremental_conversions": 0.0,
+          "incremental_revenue": 0.0,
+          "spend": 0.0,
+          "incremental_profit": 0.0,
+          "profit_ci_low": 0.0,
+          "profit_ci_high": 0.0,
+          "prob_profit_positive": 0.0,
+          "incremental_roas": null,
+          "incremental_roi": null,
+          "cost_per_incremental_conversion": null
+        }
+      },
+      "liftpilot_vs_everyone": {
+        "difference": 18739.92131072531,
+        "ci_low": 8230.257439247976,
+        "ci_high": 30825.644127672524,
+        "prob_a_better": 1.0
+      }
+    },
+    "C. E-mail + 10% discount": {
+      "economics": {
+        "margin": 0.4,
+        "contact_cost": 0.1,
+        "discount": 0.1,
+        "currency": "USD"
+      },
+      "mean_break_even_uplift": 0.07597887064308463,
+      "policies": {
+        "Contact everyone": {
+          "name": "Contact everyone",
+          "n_customers": 12800,
+          "n_selected": 12800,
+          "share_selected": 1.0,
+          "incremental_conversions": 3898.885901947905,
+          "incremental_revenue": 49150.19672318669,
+          "spend": 14480.608970605459,
+          "incremental_profit": 5179.4697186692265,
+          "profit_ci_low": -5773.809023429887,
+          "profit_ci_high": 14372.750355719774,
+          "prob_profit_positive": 0.87,
+          "incremental_roas": 3.3942078556887956,
+          "incremental_roi": 0.3576831422755189,
+          "cost_per_incremental_conversion": 3.7140376340253676
+        },
+        "Response model, same size": {
+          "name": "Response model, same size",
+          "n_customers": 12800,
+          "n_selected": 2186,
+          "share_selected": 0.17078125,
+          "incremental_conversions": 732.3401826807335,
+          "incremental_revenue": 19174.44175609526,
+          "spend": 3953.936851471595,
+          "incremental_profit": 3715.839850966511,
+          "profit_ci_low": -2985.467383319673,
+          "profit_ci_high": 9686.904638853775,
+          "prob_profit_positive": 0.89,
+          "incremental_roas": 4.849455739020927,
+          "incremental_roi": 0.9397822956083712,
+          "cost_per_incremental_conversion": 5.399043975708389
+        },
+        "LiftPilot profit rule": {
+          "name": "LiftPilot profit rule",
+          "n_customers": 12800,
+          "n_selected": 2186,
+          "share_selected": 0.17078125,
+          "incremental_conversions": 647.1891675254781,
+          "incremental_revenue": 7835.667729684341,
+          "spend": 2174.0628997289978,
+          "incremental_profit": 960.2041921447393,
+          "profit_ci_low": -3372.4521636933787,
+          "profit_ci_high": 4603.1395126883635,
+          "prob_profit_positive": 0.7066666666666667,
+          "incremental_roas": 3.6041587070277847,
+          "incremental_roi": 0.4416634828111142,
+          "cost_per_incremental_conversion": 3.359238703023271
+        }
+      },
+      "liftpilot_vs_everyone": {
+        "difference": -4219.2655265244875,
+        "ci_low": -13334.028007699344,
+        "ci_high": 5875.503088396234,
+        "prob_a_better": 0.18666666666666668
+      }
+    }
+  },
+  "types": {
+    "contact": {
+      "customers": 64000,
+      "share": 1.0,
+      "test_customers": 12800,
+      "test_uplift": 0.06092009221793601,
+      "test_uplift_ci": [
+        0.04875030564250637,
+        0.07308987879336566
+      ],
+      "test_rate_control": 0.10607838535555034
+    }
+  },
+  "uplift_by_rfm_score": {
+    "r_score": {
+      "1": {
+        "customers": 12800,
+        "rate_control": 0.07994255624700813,
+        "uplift": 0.05529288796547158,
+        "ci_low": 0.04434947031634782,
+        "ci_high": 0.06623630561459534
+      },
+      "2": {
+        "customers": 12800,
+        "rate_control": 0.07789179104477612,
+        "uplift": 0.06520031421838177,
+        "ci_low": 0.054259209127972205,
+        "ci_high": 0.07614141930879133
+      },
+      "3": {
+        "customers": 12800,
+        "rate_control": 0.10382387022016222,
+        "uplift": 0.05586970668025028,
+        "ci_low": 0.04388561827935347,
+        "ci_high": 0.06785379508114708
+      },
+      "4": {
+        "customers": 12800,
+        "rate_control": 0.12444340285915163,
+        "uplift": 0.06364988203478954,
+        "ci_low": 0.05073173680289322,
+        "ci_high": 0.07656802726668586
+      },
+      "5": {
+        "customers": 12800,
+        "rate_control": 0.1444340065758572,
+        "uplift": 0.06488465415933362,
+        "ci_low": 0.0512480987020386,
+        "ci_high": 0.07852120961662863
+      }
+    },
+    "m_score": {
+      "1": {
+        "customers": 12800,
+        "rate_control": 0.085305835481603,
+        "uplift": 0.05438712127452028,
+        "ci_low": 0.043234651646795436,
+        "ci_high": 0.06553959090224512
+      },
+      "2": {
+        "customers": 12800,
+        "rate_control": 0.08351076413532056,
+        "uplift": 0.0638122266497022,
+        "ci_low": 0.052592963896091714,
+        "ci_high": 0.07503148940331267
+      },
+      "3": {
+        "customers": 12800,
+        "rate_control": 0.09429165703720822,
+        "uplift": 0.05488809039581431,
+        "ci_low": 0.043338551335520205,
+        "ci_high": 0.06643762945610843
+      },
+      "4": {
+        "customers": 12800,
+        "rate_control": 0.1314366329649659,
+        "uplift": 0.056699555171222216,
+        "ci_low": 0.04359221154703276,
+        "ci_high": 0.06980689879541167
+      },
+      "5": {
+        "customers": 12800,
+        "rate_control": 0.13657844990548204,
+        "uplift": 0.07408915046800069,
+        "ci_low": 0.06061185073682104,
+        "ci_high": 0.08756645019918033
+      }
+    }
+  },
+  "fairness": {},
+  "feature_importance": {
+    "history": 0.49845269366143335,
+    "recency": 0.18129232493270403,
+    "womens": 0.07752834056455069,
+    "newbie": 0.059304419309189504,
+    "mens": 0.04680558831606267,
+    "zip_urban": 0.04647704115015948,
+    "channel_phone": 0.04050125545627426,
+    "channel_web": 0.025351826618056312,
+    "zip_rural": 0.024286509991569723
+  }
+}

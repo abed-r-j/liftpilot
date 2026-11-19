@@ -1,0 +1,105 @@
+[project]
+name = "liftpilot"
+version = "0.1.0"
+description = "LiftPilot: an AI campaign agent that spends marketing budget only where it changes customer behaviour (RFM + uplift modeling + profit-optimal targeting)."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = { text = "MIT" }
+authors = [
+    { name = "Abed El Rahmane Jaafir" },
+    { name = "Ghandi Mahdmoud" },
+]
+keywords = ["uplift modeling", "causal inference", "marketing", "RFM", "LLM agent"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+]
+dependencies = [
+    "numpy>=2.1",
+    "pandas>=2.2",
+    "pyarrow>=18",
+    "duckdb>=1.1",
+    "scikit-learn>=1.6",
+    "lightgbm>=4.5",
+    "scipy>=1.14",
+    "pydantic>=2.9",
+    "httpx>=0.27",
+    "pyyaml>=6.0",
+    "typer>=0.12",
+    "rich>=13.9",
+    "matplotlib>=3.9",
+    "plotly>=5.24",
+    "streamlit>=1.40",
+    "joblib>=1.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pandas-stubs>=2.2",
+    "types-PyYAML>=6.0",
+    "pre-commit>=4.0",
+    "scikit-uplift>=0.5",
+]
+docs = [
+    "typst>=0.12",
+    "python-pptx>=1.0",
+]
+
+[project.scripts]
+liftpilot = "liftpilot.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/liftpilot"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "PT", "RUF", "N", "S"]
+ignore = [
+    "S101",   # assert is used for invariants and in tests
+    "S311",   # numpy generators are used for statistics, not security
+    "N803", "N806",  # X, Xtr: the usual names for design matrices
+    "N818",   # exception names read as states (ApprovalRequired, LLMUnavailable)
+    "E501",   # the formatter owns line length; long strings are allowed
+    "RUF001", # mathematical symbols in user-facing text are intended
+    "S608",   # SQL is assembled from constants and local paths only
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "PT018", "RUF059"]
+"src/liftpilot/app/main.py" = ["SIM108"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "data: needs the downloaded real datasets",
+    "llm: needs a running local Ollama server",
+]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+files = ["src/liftpilot"]
+
+[tool.coverage.run]
+source = ["liftpilot"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true

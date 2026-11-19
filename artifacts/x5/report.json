@@ -1,0 +1,1059 @@
+{
+  "dataset": {
+    "name": "x5",
+    "description": "X5 Retail Group (RetailHero 2019): randomised SMS communication to loyalty-card holders of a grocery chain; outcome = purchase after the message.",
+    "currency": "RUB",
+    "customers_total": 400162,
+    "customers_in_experiment": 200039,
+    "treated_share": 0.4998075375301816,
+    "conversion_treated": 0.6365109370780448,
+    "conversion_control": 0.6032800975434248,
+    "splits": {
+      "new": 200123,
+      "train": 120023,
+      "test": 40008,
+      "calibration": 40008
+    },
+    "n_features": 33,
+    "revenue_observed": false,
+    "mean_value": 462.99542205897484,
+    "reference_date": "2019-03-19",
+    "history_start": "2018-11-21",
+    "invalid_ages_set_missing": 1779,
+    "source": "https://sklift.s3.eu-west-2.amazonaws.com"
+  },
+  "economics": {
+    "margin": 0.25,
+    "contact_cost": 2.0,
+    "discount": 0.0,
+    "currency": "RUB"
+  },
+  "seed": 0,
+  "experiment_readout": {
+    "rate_treated": 0.6365109370780448,
+    "rate_control": 0.6032800975434248,
+    "ate": 0.03323083953462003,
+    "relative_uplift": 0.055083599923049065,
+    "se": 0.0021693499613884035,
+    "ci_low": 0.028978913610298758,
+    "ci_high": 0.037482765458941296,
+    "z": 15.318339652930867,
+    "p_value": 0.0,
+    "n_treated": 99981.0,
+    "n_control": 100058.0
+  },
+  "learners": {
+    "response": {
+      "fit_seconds": 1.83,
+      "qini_calibration": -0.011319064383666233,
+      "qini_test": {
+        "value": -0.005210631427726064,
+        "ci_low": -0.011642263254009936,
+        "ci_high": 0.0010016477517430674,
+        "se": 0.00312365981247004
+      },
+      "auuc_test": 0.014537702199656588,
+      "uplift_at_10": 0.01893754069842113,
+      "uplift_at_30": 0.014781191331213694,
+      "uplift_bottom_30": 0.0408480066711569
+    },
+    "s_learner": {
+      "fit_seconds": 3.24,
+      "qini_calibration": 0.019921442174843377,
+      "qini_test": {
+        "value": 0.008875495511347059,
+        "ci_low": 0.0021099233156815405,
+        "ci_high": 0.015551665173969682,
+        "se": 0.003227170842548944
+      },
+      "auuc_test": 0.02021871701745984,
+      "uplift_at_10": 0.0991858887381275,
+      "uplift_at_30": 0.049560601061755805,
+      "uplift_bottom_30": 0.029255026102410264
+    },
+    "t_learner": {
+      "fit_seconds": 3.09,
+      "qini_calibration": 0.013056905486476828,
+      "qini_test": {
+        "value": 0.009223067232551492,
+        "ci_low": 0.0012273053000989415,
+        "ci_high": 0.016392035036447084,
+        "se": 0.003674854387457611
+      },
+      "auuc_test": 0.020260831942900678,
+      "uplift_at_10": 0.07872626613123318,
+      "uplift_at_30": 0.04393718147034653,
+      "uplift_bottom_30": 0.019843033885841632
+    },
+    "x_learner": {
+      "fit_seconds": 6.3,
+      "qini_calibration": 0.018736848945593295,
+      "qini_test": {
+        "value": 0.0073271720490824125,
+        "ci_low": 0.00030860920834452604,
+        "ci_high": 0.014926080874362256,
+        "se": 0.0036165369765583386
+      },
+      "auuc_test": 0.01959501684707307,
+      "uplift_at_10": 0.08975050937107854,
+      "uplift_at_30": 0.04353764448141362,
+      "uplift_bottom_30": 0.029112229940730372
+    },
+    "dr_learner": {
+      "fit_seconds": 10.04,
+      "qini_calibration": 0.014590722812503973,
+      "qini_test": {
+        "value": 0.009809992401330361,
+        "ci_low": 0.0032333536260893167,
+        "ci_high": 0.016195407008573665,
+        "se": 0.0034854175453295348
+      },
+      "auuc_test": 0.02061379016249592,
+      "uplift_at_10": 0.0757007173966821,
+      "uplift_at_30": 0.04803000067310903,
+      "uplift_bottom_30": 0.02404582261018351
+    },
+    "class_transformation": {
+      "fit_seconds": 2.25,
+      "qini_calibration": 0.014610332384506238,
+      "qini_test": {
+        "value": 0.008219539128600543,
+        "ci_low": 0.0025019604101081997,
+        "ci_high": 0.015639514390469754,
+        "se": 0.0034115840717755448
+      },
+      "auuc_test": 0.019904181402245206,
+      "uplift_at_10": 0.05073318005318306,
+      "uplift_at_30": 0.04532414610962876,
+      "uplift_bottom_30": 0.019828228330162845
+    },
+    "ensemble": {
+      "fit_seconds": 6.39,
+      "qini_calibration": 0.017898869071114213,
+      "qini_test": {
+        "value": 0.00896941280404872,
+        "ci_low": 0.0016796239928848784,
+        "ci_high": 0.016322777938142557,
+        "se": 0.0034564270058829935
+      },
+      "auuc_test": 0.02022470471353318,
+      "uplift_at_10": 0.08719255423249889,
+      "uplift_at_30": 0.04754928355957866,
+      "uplift_bottom_30": 0.023679241405891616
+    }
+  },
+  "learners_repeated": {
+    "response": {
+      "mean": -0.005152716248194374,
+      "sd": 0.0024247950146553208,
+      "runs": 5
+    },
+    "s_learner": {
+      "mean": 0.014349541133856364,
+      "sd": 0.002991517205168491,
+      "runs": 5
+    },
+    "t_learner": {
+      "mean": 0.011523647610162346,
+      "sd": 0.0023960940403396935,
+      "runs": 5
+    },
+    "x_learner": {
+      "mean": 0.014543558884453975,
+      "sd": 0.0009229552622819219,
+      "runs": 5
+    },
+    "dr_learner": {
+      "mean": 0.012465733230116325,
+      "sd": 0.0020017232922973386,
+      "runs": 5
+    },
+    "class_transformation": {
+      "mean": 0.011635168732593484,
+      "sd": 0.0022100270441080642,
+      "runs": 5
+    },
+    "ensemble": {
+      "mean": 0.01413431396084433,
+      "sd": 0.0016091794080880266,
+      "runs": 5
+    }
+  },
+  "champion": "s_learner",
+  "calibration": {
+    "informative": true,
+    "bin_score": [
+      0.0013976641197563607,
+      0.004213264363963509,
+      0.006748860407183756,
+      0.009052609158375123,
+      0.011162734548873097,
+      0.013132003239622683,
+      0.014896430261303717,
+      0.016656345922908402,
+      0.0184205874798551,
+      0.020233255503057875,
+      0.022101995676312988,
+      0.02413864022996137,
+      0.026451188824932918,
+      0.029110207381193767,
+      0.032211208483163924,
+      0.0362831584088198,
+      0.041713048262502495,
+      0.049308497614272015,
+      0.06201209953972291,
+      0.10602442676286011
+    ],
+    "bin_uplift_observed": [
+      -0.016654045424483344,
+      -0.010132448213707623,
+      -0.000689339612651052,
+      0.01067109722177817,
+      -0.003013619240799792,
+      0.02171341686363748,
+      0.028242485522566474,
+      0.05550560450758257,
+      0.03004930840163933,
+      0.052467138007861513,
+      0.007709511064168617,
+      0.030944340212632815,
+      0.03608935114431233,
+      0.055937055937056,
+      0.017169082444613126,
+      0.07682922926766822,
+      0.030838123352493474,
+      0.042586447362092994,
+      0.10299770791748503,
+      0.11073578381147542
+    ],
+    "bin_uplift_fitted": [
+      -0.016654045424483344,
+      -0.010132448213707623,
+      -0.000689339612651052,
+      0.004246706933770333,
+      0.004246706933770333,
+      0.02171341686363748,
+      0.028242485522566474,
+      0.0355319668359045,
+      0.0355319668359045,
+      0.0355319668359045,
+      0.0355319668359045,
+      0.0355319668359045,
+      0.036089351144312325,
+      0.03656322427401533,
+      0.03656322427401533,
+      0.05010315589034305,
+      0.05010315589034305,
+      0.05010315589034305,
+      0.10299770791748503,
+      0.11073578381147542
+    ]
+  },
+  "scale_to_base": 10.002049590081983,
+  "policies": {
+    "Contact everyone": {
+      "name": "Contact everyone",
+      "n_customers": 40008,
+      "n_selected": 40008,
+      "share_selected": 1.0,
+      "incremental_conversions": 13301.096074041927,
+      "incremental_revenue": 6224880.1060640905,
+      "spend": 800323.9999999999,
+      "incremental_profit": 755896.0265160226,
+      "profit_ci_low": 209645.9277757833,
+      "profit_ci_high": 1377215.769189051,
+      "prob_profit_positive": 0.9933333333333333,
+      "incremental_roas": 7.777950062804678,
+      "incremental_roi": 0.9444875157011693,
+      "cost_per_incremental_conversion": 60.16977815549287
+    },
+    "Random, same size": {
+      "name": "Random, same size",
+      "n_customers": 40008,
+      "n_selected": 28092,
+      "share_selected": 0.7021595680863827,
+      "incremental_conversions": 9533.045087568009,
+      "incremental_revenue": 4004753.9910196657,
+      "spend": 561955.1541691661,
+      "incremental_profit": 439233.3435857502,
+      "profit_ci_low": -50143.571514449875,
+      "profit_ci_high": 936227.0406142917,
+      "prob_profit_positive": 0.97,
+      "incremental_roas": 7.126465450682759,
+      "incremental_roi": 0.7816163626706896,
+      "cost_per_incremental_conversion": 58.94812717313261
+    },
+    "Response model, same size": {
+      "name": "Response model, same size",
+      "n_customers": 40008,
+      "n_selected": 28092,
+      "share_selected": 0.7021595680863827,
+      "incremental_conversions": 8763.506256178855,
+      "incremental_revenue": 4130523.06050586,
+      "spend": 561955.1541691661,
+      "incremental_profit": 470675.61095729884,
+      "profit_ci_low": -8412.08240455909,
+      "profit_ci_high": 967684.8175207125,
+      "prob_profit_positive": 0.9666666666666667,
+      "incremental_roas": 7.350271689584758,
+      "incremental_roi": 0.8375679223961895,
+      "cost_per_incremental_conversion": 64.12446545273478
+    },
+    "Uplift ranking (s_learner), same size": {
+      "name": "Uplift ranking (s_learner), same size",
+      "n_customers": 40008,
+      "n_selected": 28092,
+      "share_selected": 0.7021595680863827,
+      "incremental_conversions": 9770.284250859972,
+      "incremental_revenue": 4458280.546459252,
+      "spend": 561955.1541691661,
+      "incremental_profit": 552614.9824456448,
+      "profit_ci_low": 105863.50565855342,
+      "profit_ci_high": 1034317.7585927538,
+      "prob_profit_positive": 0.99,
+      "incremental_roas": 7.933516604275454,
+      "incremental_roi": 0.9833791510688599,
+      "cost_per_incremental_conversion": 57.51676611862172
+    },
+    "LiftPilot profit rule": {
+      "name": "LiftPilot profit rule",
+      "n_customers": 40008,
+      "n_selected": 28092,
+      "share_selected": 0.7021595680863827,
+      "incremental_conversions": 9927.220598578542,
+      "incremental_revenue": 5085081.2060939185,
+      "spend": 561955.1541691661,
+      "incremental_profit": 709315.1473543135,
+      "profit_ci_low": 243852.8496689155,
+      "profit_ci_high": 1198625.2988640268,
+      "prob_profit_positive": 0.9966666666666667,
+      "incremental_roas": 9.048909273929624,
+      "incremental_roi": 1.262227318482406,
+      "cost_per_incremental_conversion": 56.607501423876016
+    },
+    "RFM best customers, same size": {
+      "name": "RFM best customers, same size",
+      "n_customers": 40008,
+      "n_selected": 28092,
+      "share_selected": 0.7021595680863827,
+      "incremental_conversions": 7869.17803042686,
+      "incremental_revenue": 3976527.322551798,
+      "spend": 561955.1541691661,
+      "incremental_profit": 432176.67646878335,
+      "profit_ci_low": -53354.53480228956,
+      "profit_ci_high": 939983.0246796105,
+      "prob_profit_positive": 0.95,
+      "incremental_roas": 7.076236053802148,
+      "incremental_roi": 0.7690590134505371,
+      "cost_per_incremental_conversion": 71.41217951815523
+    },
+    "RFM at-risk segments": {
+      "name": "RFM at-risk segments",
+      "n_customers": 40008,
+      "n_selected": 9184,
+      "share_selected": 0.22955408918216358,
+      "incremental_conversions": 3613.462269631891,
+      "incremental_revenue": 2291942.7906165286,
+      "spend": 183717.64687062585,
+      "incremental_profit": 389268.05078350625,
+      "profit_ci_low": 85442.5356111372,
+      "profit_ci_high": 672609.9173544019,
+      "prob_profit_positive": 0.9933333333333333,
+      "incremental_roas": 12.475354597974558,
+      "incremental_roi": 2.1188386494936395,
+      "cost_per_incremental_conversion": 50.84255297602469
+    }
+  },
+  "plan_expected": {
+    "customers_total": 40008,
+    "customers_eligible": 40008,
+    "customers_selected": 28092,
+    "share_selected": 0.7021595680863827,
+    "expected_spend": 56184.0,
+    "expected_incremental_profit": 90887.90717582087,
+    "expected_incremental_roi": 1.617683097960645,
+    "budget": null,
+    "budget_left": null
+  },
+  "liftpilot_vs_everyone": {
+    "difference": -46580.87916170904,
+    "ci_low": -347879.5654696346,
+    "ci_high": 230187.28261219568,
+    "prob_a_better": 0.3433333333333333
+  },
+  "scenarios": {
+    "A. Text reminder (2 RUB per message)": {
+      "economics": {
+        "margin": 0.25,
+        "contact_cost": 2.0,
+        "discount": 0.0,
+        "currency": "RUB"
+      },
+      "mean_break_even_uplift": 0.021285105454904196,
+      "policies": {
+        "Contact everyone": {
+          "name": "Contact everyone",
+          "n_customers": 40008,
+          "n_selected": 40008,
+          "share_selected": 1.0,
+          "incremental_conversions": 13301.096074041927,
+          "incremental_revenue": 6224880.1060640905,
+          "spend": 800323.9999999999,
+          "incremental_profit": 755896.0265160226,
+          "profit_ci_low": 209645.9277757833,
+          "profit_ci_high": 1377215.769189051,
+          "prob_profit_positive": 0.9933333333333333,
+          "incremental_roas": 7.777950062804678,
+          "incremental_roi": 0.9444875157011693,
+          "cost_per_incremental_conversion": 60.16977815549287
+        },
+        "Response model, same size": {
+          "name": "Response model, same size",
+          "n_customers": 40008,
+          "n_selected": 28092,
+          "share_selected": 0.7021595680863827,
+          "incremental_conversions": 8763.506256178855,
+          "incremental_revenue": 4130523.06050586,
+          "spend": 561955.1541691661,
+          "incremental_profit": 470675.61095729884,
+          "profit_ci_low": -8412.08240455909,
+          "profit_ci_high": 967684.8175207125,
+          "prob_profit_positive": 0.9666666666666667,
+          "incremental_roas": 7.350271689584758,
+          "incremental_roi": 0.8375679223961895,
+          "cost_per_incremental_conversion": 64.12446545273478
+        },
+        "LiftPilot profit rule": {
+          "name": "LiftPilot profit rule",
+          "n_customers": 40008,
+          "n_selected": 28092,
+          "share_selected": 0.7021595680863827,
+          "incremental_conversions": 9927.220598578542,
+          "incremental_revenue": 5085081.2060939185,
+          "spend": 561955.1541691661,
+          "incremental_profit": 709315.1473543135,
+          "profit_ci_low": 243852.8496689155,
+          "profit_ci_high": 1198625.2988640268,
+          "prob_profit_positive": 0.9966666666666667,
+          "incremental_roas": 9.048909273929624,
+          "incremental_roi": 1.262227318482406,
+          "cost_per_incremental_conversion": 56.607501423876016
+        },
+        "RFM best customers, same size": {
+          "name": "RFM best customers, same size",
+          "n_customers": 40008,
+          "n_selected": 28092,
+          "share_selected": 0.7021595680863827,
+          "incremental_conversions": 7869.17803042686,
+          "incremental_revenue": 3976527.322551798,
+          "spend": 561955.1541691661,
+          "incremental_profit": 432176.67646878335,
+          "profit_ci_low": -53354.53480228956,
+          "profit_ci_high": 939983.0246796105,
+          "prob_profit_positive": 0.95,
+          "incremental_roas": 7.076236053802148,
+          "incremental_roi": 0.7690590134505371,
+          "cost_per_incremental_conversion": 71.41217951815523
+        }
+      },
+      "liftpilot_vs_everyone": {
+        "difference": -46580.87916170904,
+        "ci_low": -347879.5654696346,
+        "ci_high": 230187.28261219568,
+        "prob_a_better": 0.3433333333333333
+      }
+    },
+    "B. Costlier channel (6 RUB per contact)": {
+      "economics": {
+        "margin": 0.25,
+        "contact_cost": 6.0,
+        "discount": 0.0,
+        "currency": "RUB"
+      },
+      "mean_break_even_uplift": 0.06385531636471259,
+      "policies": {
+        "Contact everyone": {
+          "name": "Contact everyone",
+          "n_customers": 40008,
+          "n_selected": 40008,
+          "share_selected": 1.0,
+          "incremental_conversions": 13301.096074041927,
+          "incremental_revenue": 6224880.1060640905,
+          "spend": 2400972.0,
+          "incremental_profit": -844751.9734839773,
+          "profit_ci_low": -1391002.0722242168,
+          "profit_ci_high": -223432.23081094908,
+          "prob_profit_positive": 0.006666666666666667,
+          "incremental_roas": 2.5926500209348924,
+          "incremental_roi": -0.3518374947662769,
+          "cost_per_incremental_conversion": 180.5093344664786
+        },
+        "Response model, same size": {
+          "name": "Response model, same size",
+          "n_customers": 40008,
+          "n_selected": 7712,
+          "share_selected": 0.19276144771045792,
+          "incremental_conversions": 1001.163820801782,
+          "incremental_revenue": 52068.030152596344,
+          "spend": 462814.8386322735,
+          "incremental_profit": -449797.8310941233,
+          "profit_ci_low": -673151.4327339126,
+          "profit_ci_high": -240618.8268945165,
+          "prob_profit_positive": 0.0,
+          "incremental_roas": 0.11250294028270484,
+          "incremental_roi": -0.9718742649293214,
+          "cost_per_incremental_conversion": 462.27683123989465
+        },
+        "LiftPilot profit rule": {
+          "name": "LiftPilot profit rule",
+          "n_customers": 40008,
+          "n_selected": 7712,
+          "share_selected": 0.19276144771045792,
+          "incremental_conversions": 4914.545252045535,
+          "incremental_revenue": 2670305.679345593,
+          "spend": 462814.8386322735,
+          "incremental_profit": 204761.58120412478,
+          "profit_ci_low": -206450.35808975634,
+          "profit_ci_high": 598342.3266289317,
+          "prob_profit_positive": 0.84,
+          "incremental_roas": 5.769706276568343,
+          "incremental_roi": 0.44242656914208567,
+          "cost_per_incremental_conversion": 94.17246457129283
+        },
+        "RFM best customers, same size": {
+          "name": "RFM best customers, same size",
+          "n_customers": 40008,
+          "n_selected": 7712,
+          "share_selected": 0.19276144771045792,
+          "incremental_conversions": 1597.0804905189152,
+          "incremental_revenue": 1167715.4268061635,
+          "spend": 462814.8386322735,
+          "incremental_profit": -170885.98193073264,
+          "profit_ci_low": -422074.21228481847,
+          "profit_ci_high": 71111.80562195959,
+          "prob_profit_positive": 0.09333333333333334,
+          "incremental_roas": 2.523072575324155,
+          "incremental_roi": -0.36923185616896126,
+          "cost_per_incremental_conversion": 289.7880484920945
+        }
+      },
+      "liftpilot_vs_everyone": {
+        "difference": 1049513.554688102,
+        "ci_low": 633841.2967576585,
+        "ci_high": 1427148.748507792,
+        "prob_a_better": 1.0
+      }
+    },
+    "C. Reminder + 3% basket discount": {
+      "economics": {
+        "margin": 0.25,
+        "contact_cost": 2.0,
+        "discount": 0.03,
+        "currency": "RUB"
+      },
+      "mean_break_even_uplift": 0.09784534750436188,
+      "policies": {
+        "Contact everyone": {
+          "name": "Contact everyone",
+          "n_customers": 40008,
+          "n_selected": 40008,
+          "share_selected": 1.0,
+          "incremental_conversions": 13301.096074041927,
+          "incremental_revenue": 6224880.1060640905,
+          "spend": 4264331.705895664,
+          "incremental_profit": -2708111.679379642,
+          "profit_ci_low": -3215799.201971808,
+          "profit_ci_high": -2120270.6117336815,
+          "prob_profit_positive": 0.0,
+          "incremental_roas": 1.4597551352437863,
+          "incremental_roi": -0.6350612161890536,
+          "cost_per_incremental_conversion": 320.6000228971974
+        },
+        "Response model, same size": {
+          "name": "Response model, same size",
+          "n_customers": 40008,
+          "n_selected": 3124,
+          "share_selected": 0.07808438312337533,
+          "incremental_conversions": 551.4489295891949,
+          "incremental_revenue": -107647.0906352582,
+          "spend": 366297.28602667974,
+          "incremental_profit": -393209.0586854944,
+          "profit_ci_low": -501278.1511056884,
+          "profit_ci_high": -283844.7912731495,
+          "prob_profit_positive": 0.0,
+          "incremental_roas": -0.29387902870625576,
+          "incremental_roi": -1.0734697571765641,
+          "cost_per_incremental_conversion": 664.2451664554958
+        },
+        "LiftPilot profit rule": {
+          "name": "LiftPilot profit rule",
+          "n_customers": 40008,
+          "n_selected": 3124,
+          "share_selected": 0.07808438312337533,
+          "incremental_conversions": 3188.3938245276872,
+          "incremental_revenue": 1154153.4847955985,
+          "spend": 227605.41382797286,
+          "incremental_profit": 60932.95737092674,
+          "profit_ci_low": -42660.44279247197,
+          "profit_ci_high": 173515.5187204065,
+          "prob_profit_positive": 0.8933333333333333,
+          "incremental_roas": 5.070852513499187,
+          "incremental_roi": 0.2677131283747963,
+          "cost_per_incremental_conversion": 71.38560239235478
+        },
+        "RFM best customers, same size": {
+          "name": "RFM best customers, same size",
+          "n_customers": 40008,
+          "n_selected": 3124,
+          "share_selected": 0.07808438312337533,
+          "incremental_conversions": 406.11814116516877,
+          "incremental_revenue": 251700.24133306262,
+          "spend": 408421.43341535534,
+          "incremental_profit": -345496.37308209005,
+          "profit_ci_low": -463194.1366226408,
+          "profit_ci_high": -228902.67894373057,
+          "prob_profit_positive": 0.0,
+          "incremental_roas": 0.6162757895154076,
+          "incremental_roi": -0.8459310526211489,
+          "cost_per_incremental_conversion": 1005.6714832870513
+        }
+      },
+      "liftpilot_vs_everyone": {
+        "difference": 2769044.636750569,
+        "ci_low": 2203377.5516571333,
+        "ci_high": 3249314.4232327193,
+        "prob_a_better": 1.0
+      }
+    }
+  },
+  "types": {
+    "contact": {
+      "customers": 283024,
+      "share": 0.7072735542105447,
+      "test_customers": 28092,
+      "test_uplift": 0.035331006486649774,
+      "test_uplift_ci": [
+        0.023689393024929166,
+        0.04697261994837038
+      ],
+      "test_rate_control": 0.5263793225875169
+    },
+    "skip: gain below cost": {
+      "customers": 64306,
+      "share": 0.1606999165338038,
+      "test_customers": 6485,
+      "test_uplift": 0.03664216180667146,
+      "test_uplift_ci": [
+        0.01532908260617697,
+        0.057955241007165946
+      ],
+      "test_rate_control": 0.7230430682175416
+    },
+    "skip: no expected effect": {
+      "customers": 52832,
+      "share": 0.13202652925565145,
+      "test_customers": 5431,
+      "test_uplift": 0.016706081365175485,
+      "test_uplift_ci": [
+        -0.0013407917617889592,
+        0.03475295449213993
+      ],
+      "test_rate_control": 0.858806404657933
+    }
+  },
+  "uplift_by_rfm_score": {
+    "r_score": {
+      "1": {
+        "customers": 39954,
+        "rate_control": 0.37767875025035047,
+        "uplift": 0.040397518391427134,
+        "ci_low": 0.030806540647696733,
+        "ci_high": 0.04998849613515753
+      },
+      "2": {
+        "customers": 39889,
+        "rate_control": 0.4630293971101146,
+        "uplift": 0.04527071894014023,
+        "ci_low": 0.03547067280896264,
+        "ci_high": 0.05507076507131782
+      },
+      "3": {
+        "customers": 40054,
+        "rate_control": 0.6242667335171722,
+        "uplift": 0.027182866164562336,
+        "ci_low": 0.01777221391454663,
+        "ci_high": 0.036593518414578044
+      },
+      "4": {
+        "customers": 39974,
+        "rate_control": 0.7349457549517269,
+        "uplift": 0.03034599555129125,
+        "ci_low": 0.02186333307715766,
+        "ci_high": 0.03882865802542484
+      },
+      "5": {
+        "customers": 40168,
+        "rate_control": 0.8163387896080493,
+        "uplift": 0.020519216434246812,
+        "ci_low": 0.013115813741974177,
+        "ci_high": 0.027922619126519447
+      }
+    },
+    "f_score": {
+      "1": {
+        "customers": 39969,
+        "rate_control": 0.29460767197086846,
+        "uplift": 0.04531803829918474,
+        "ci_low": 0.036202424721586246,
+        "ci_high": 0.05443365187678323
+      },
+      "2": {
+        "customers": 40144,
+        "rate_control": 0.46776596801430415,
+        "uplift": 0.045677310346515454,
+        "ci_low": 0.035906526302349674,
+        "ci_high": 0.055448094390681234
+      },
+      "3": {
+        "customers": 39854,
+        "rate_control": 0.6162100114787643,
+        "uplift": 0.03136530264547244,
+        "ci_low": 0.021900197330578273,
+        "ci_high": 0.040830407960366605
+      },
+      "4": {
+        "customers": 39976,
+        "rate_control": 0.7545586979454463,
+        "uplift": 0.023407319295073892,
+        "ci_low": 0.015112280618933271,
+        "ci_high": 0.03170235797121451
+      },
+      "5": {
+        "customers": 40096,
+        "rate_control": 0.8865198414689209,
+        "uplift": 0.013495037269362076,
+        "ci_low": 0.007450563192129107,
+        "ci_high": 0.019539511346595043
+      }
+    },
+    "m_score": {
+      "1": {
+        "customers": 39921,
+        "rate_control": 0.3484825833457916,
+        "uplift": 0.05581881687582624,
+        "ci_low": 0.04632827941492912,
+        "ci_high": 0.06530935433672336
+      },
+      "2": {
+        "customers": 40195,
+        "rate_control": 0.5098847605801708,
+        "uplift": 0.03828849366894449,
+        "ci_low": 0.028535745706196707,
+        "ci_high": 0.04804124163169227
+      },
+      "3": {
+        "customers": 40064,
+        "rate_control": 0.6256764136424564,
+        "uplift": 0.03553537291444331,
+        "ci_low": 0.026161482551707374,
+        "ci_high": 0.04490926327717924
+      },
+      "4": {
+        "customers": 39848,
+        "rate_control": 0.7219391615799828,
+        "uplift": 0.01858518298930556,
+        "ci_low": 0.009880670911240563,
+        "ci_high": 0.027289695067370556
+      },
+      "5": {
+        "customers": 40011,
+        "rate_control": 0.8139043884783592,
+        "uplift": 0.011873521850699342,
+        "ci_low": 0.004341937838381058,
+        "ci_high": 0.01940510586301763
+      }
+    }
+  },
+  "rfm_segments": {
+    "Champions": {
+      "customers": 87792,
+      "share": 0.21939114658563283,
+      "recency_days": 1.794981319482413,
+      "frequency": 40.70058775287042,
+      "monetary": 16951.385158328776,
+      "avg_basket": 472.81956316555585,
+      "conversion_control": 0.8808694057226706,
+      "observed_uplift": 0.012499197761777103,
+      "uplift_ci_low": 0.006568129199082313,
+      "uplift_ci_high": 0.018430266324471895,
+      "predicted_uplift": 0.006545629858946128,
+      "share_selected": 0.2747972480408238
+    },
+    "Loyal": {
+      "customers": 26624,
+      "share": 0.0665330541130842,
+      "recency_days": 4.907038762019231,
+      "frequency": 31.876314603365383,
+      "monetary": 15988.809700646034,
+      "avg_basket": 550.8448174801745,
+      "conversion_control": 0.8020281519600424,
+      "observed_uplift": 0.012351127587441946,
+      "uplift_ci_low": -0.0010201112179712146,
+      "uplift_ci_high": 0.025722366392855106,
+      "predicted_uplift": 0.017941499991230344,
+      "share_selected": 0.49158653846153844
+    },
+    "Potential loyalists": {
+      "customers": 49255,
+      "share": 0.12308764950195171,
+      "recency_days": 1.9789056948533144,
+      "frequency": 17.97868236727236,
+      "monetary": 6405.641495279668,
+      "avg_basket": 415.885466086177,
+      "conversion_control": 0.7035014455509155,
+      "observed_uplift": 0.03266671100863994,
+      "uplift_ci_low": 0.021510930089941573,
+      "uplift_ci_high": 0.0438224919273383,
+      "predicted_uplift": 0.03568307259821394,
+      "share_selected": 0.7737285554766014
+    },
+    "New customers": {
+      "customers": 23018,
+      "share": 0.05752170370999745,
+      "recency_days": 2.1028325658180553,
+      "frequency": 7.945825006516639,
+      "monetary": 2658.8774467807802,
+      "avg_basket": 391.20241021182966,
+      "conversion_control": 0.5345035277921184,
+      "observed_uplift": 0.05592943310173637,
+      "uplift_ci_low": 0.03785389332142558,
+      "uplift_ci_high": 0.07400497288204716,
+      "predicted_uplift": 0.0646541174901608,
+      "share_selected": 0.9693717959857503
+    },
+    "Need attention": {
+      "customers": 38464,
+      "share": 0.09612107096625866,
+      "recency_days": 5.084780574043261,
+      "frequency": 14.786787645590682,
+      "monetary": 6021.723700343177,
+      "avg_basket": 453.4684701607725,
+      "conversion_control": 0.5945834194748811,
+      "observed_uplift": 0.03487620915019707,
+      "uplift_ci_low": 0.02112067172159537,
+      "uplift_ci_high": 0.04863174657879876,
+      "predicted_uplift": 0.038457474730823525,
+      "share_selected": 0.8334286605657238
+    },
+    "At risk": {
+      "customers": 42979,
+      "share": 0.10740400137944132,
+      "recency_days": 11.788664231368807,
+      "frequency": 18.117080434630868,
+      "monetary": 8987.809734521512,
+      "avg_basket": 536.1213437319852,
+      "conversion_control": 0.5626696620799401,
+      "observed_uplift": 0.03249451140768811,
+      "uplift_ci_low": 0.0192435713472359,
+      "uplift_ci_high": 0.04574545146814032,
+      "predicted_uplift": 0.03481846842130381,
+      "share_selected": 0.8295446613462388
+    },
+    "Cannot lose them": {
+      "customers": 11433,
+      "share": 0.028570928773846593,
+      "recency_days": 11.151316364908597,
+      "frequency": 35.21953992827779,
+      "monetary": 17881.7202965101,
+      "avg_basket": 548.9346796000152,
+      "conversion_control": 0.6582189369940162,
+      "observed_uplift": 0.019408181650051537,
+      "uplift_ci_low": -0.004858576386155396,
+      "uplift_ci_high": 0.04367493968625847,
+      "predicted_uplift": 0.025082116708865853,
+      "share_selected": 0.6578325898714248
+    },
+    "Hibernating": {
+      "customers": 120597,
+      "share": 0.3013704449697872,
+      "recency_days": 12.213885917560138,
+      "frequency": 6.673905652711095,
+      "monetary": 2748.4223416005375,
+      "avg_basket": 439.49355499771644,
+      "conversion_control": 0.3430852826187794,
+      "observed_uplift": 0.046497426276548126,
+      "uplift_ci_low": 0.038808926045940356,
+      "uplift_ci_high": 0.054185926507155896,
+      "predicted_uplift": 0.04930682235979065,
+      "share_selected": 0.9134306823552825
+    }
+  },
+  "fairness": {
+    "age_band": {
+      "groups": [
+        {
+          "group": "18-24",
+          "customers": 3229,
+          "selected": 2298,
+          "selection_rate": 0.7116754413,
+          "small_group": false,
+          "observed_uplift": 0.0037948836,
+          "uplift_se": 0.0174050638,
+          "rate_vs_overall": 1.0135522945
+        },
+        {
+          "group": "25-34",
+          "customers": 7654,
+          "selected": 5328,
+          "selection_rate": 0.6961066109,
+          "small_group": false,
+          "observed_uplift": 0.0322692763,
+          "uplift_se": 0.0112269872,
+          "rate_vs_overall": 0.9913795134
+        },
+        {
+          "group": "35-44",
+          "customers": 8339,
+          "selected": 5832,
+          "selection_rate": 0.6993644322,
+          "small_group": false,
+          "observed_uplift": 0.0373267799,
+          "uplift_se": 0.0106849089,
+          "rate_vs_overall": 0.9960192298
+        },
+        {
+          "group": "45-54",
+          "customers": 6864,
+          "selected": 4909,
+          "selection_rate": 0.7151806527,
+          "small_group": false,
+          "observed_uplift": 0.0180292102,
+          "uplift_se": 0.0117565992,
+          "rate_vs_overall": 1.0185443383
+        },
+        {
+          "group": "55-64",
+          "customers": 7760,
+          "selected": 5491,
+          "selection_rate": 0.7076030928,
+          "small_group": false,
+          "observed_uplift": 0.0371214038,
+          "uplift_se": 0.0108809033,
+          "rate_vs_overall": 1.0077525465
+        },
+        {
+          "group": "65+",
+          "customers": 5991,
+          "selected": 4106,
+          "selection_rate": 0.6853613754,
+          "small_group": false,
+          "observed_uplift": 0.0533433124,
+          "uplift_se": 0.0120825326,
+          "rate_vs_overall": 0.9760763885
+        },
+        {
+          "group": "unknown",
+          "customers": 171,
+          "selected": 128,
+          "selection_rate": 0.7485380117,
+          "small_group": true,
+          "observed_uplift": 0.1530668127,
+          "uplift_se": 0.0750398731,
+          "rate_vs_overall": 1.0660511452
+        }
+      ],
+      "disparate_impact": {
+        "ratio": 0.9583052517256226,
+        "flag": false,
+        "lowest": "65+",
+        "highest": "45-54"
+      }
+    },
+    "gender": {
+      "groups": [
+        {
+          "group": "female",
+          "customers": 14926,
+          "selected": 10195,
+          "selection_rate": 0.6830363125,
+          "small_group": false,
+          "observed_uplift": 0.0275867955,
+          "uplift_se": 0.0078611441,
+          "rate_vs_overall": 0.9727650858
+        },
+        {
+          "group": "male",
+          "customers": 6648,
+          "selected": 4530,
+          "selection_rate": 0.6814079422,
+          "small_group": false,
+          "observed_uplift": 0.0208086363,
+          "uplift_se": 0.0119099413,
+          "rate_vs_overall": 0.9704459972
+        },
+        {
+          "group": "unknown",
+          "customers": 18434,
+          "selected": 13367,
+          "selection_rate": 0.7251274818,
+          "small_group": false,
+          "observed_uplift": 0.0418695263,
+          "uplift_se": 0.0071955438,
+          "rate_vs_overall": 1.0327103906
+        }
+      ],
+      "disparate_impact": {
+        "ratio": 0.9976159829179377,
+        "flag": false,
+        "lowest": "male",
+        "highest": "female"
+      }
+    }
+  },
+  "ablation": {
+    "RFM only (3 features)": {
+      "n_features": 3,
+      "qini_test": {
+        "value": 0.00852989301981002,
+        "ci_low": 0.002422230995215778,
+        "ci_high": 0.014858981939552622,
+        "se": 0.0030305071707355034
+      }
+    },
+    "All behaviour features": {
+      "n_features": 33,
+      "qini_test": {
+        "value": 0.008875495511347059,
+        "ci_low": 0.0021099233156815405,
+        "ci_high": 0.015551665173969682,
+        "se": 0.003227170842548944
+      }
+    },
+    "Behaviour + age and gender": {
+      "n_features": 36,
+      "qini_test": {
+        "value": 0.009690283991954145,
+        "ci_low": 0.003359057462223662,
+        "ci_high": 0.016399797141256015,
+        "se": 0.0032692197574507387
+      }
+    }
+  },
+  "feature_importance": {
+    "monetary_30d": 0.06524312987135757,
+    "monetary": 0.0651761332067827,
+    "avg_gap_days": 0.06167692617667088,
+    "express_spent": 0.060948275737100474,
+    "days_since_first_redeem": 0.05496130133080632,
+    "card_age_days": 0.054592505588736025,
+    "share_weekend": 0.04953154822026032,
+    "points_received": 0.04881572358955389,
+    "max_basket": 0.04627072057865223,
+    "avg_lines": 0.04550574615036182,
+    "median_basket": 0.043642856356667335,
+    "tenure_days": 0.03866779006315498,
+    "monetary_31_60d": 0.03728921044505136,
+    "avg_units": 0.03701281898448296,
+    "avg_basket": 0.03515517534233
+  }
+}
