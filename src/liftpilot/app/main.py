@@ -46,7 +46,7 @@ st.set_page_config(page_title="LiftPilot", page_icon="🎯", layout="wide")
 st.markdown(
     """
     <style>
-    .block-container {padding-top: 1.6rem; max-width: 1280px;}
+    .block-container {padding-top: 4.2rem; max-width: 1280px;}
     div[data-testid="stMetric"] {background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px;
         padding:12px 16px;}
     div[data-testid="stMetricValue"] {font-size:1.55rem;}
