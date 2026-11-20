@@ -268,6 +268,15 @@ class CampaignEngine:
             currency=self.currency,
         )
         part = self._audience(audience)
+        if segments:
+            known = set(part["rfm_segment"].unique()) if "rfm_segment" in part.columns else set()
+            unknown = [s for s in segments if s not in known]
+            if unknown:
+                raise ValueError(
+                    f"unknown segment(s) {unknown}. A campaign can only be restricted to RFM "
+                    f"segments: {sorted(known)}. Targeting by age, gender or any other personal "
+                    "attribute is not available in this system."
+                )
         rules = {
             "exclude_no_effect": exclude_no_effect,
             "segments": segments,

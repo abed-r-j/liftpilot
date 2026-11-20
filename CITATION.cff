@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "LiftPilot: profit-calibrated uplift targeting with a guarded campaign agent"
+type: software
+authors:
+  - family-names: Jaafir
+    given-names: Abed El Rahmane
+    affiliation: "Saint Joseph University of Beirut (USJ)"
+  - family-names: Mahdmoud
+    given-names: Ghandi
+    affiliation: "Saint Joseph University of Beirut (USJ)"
+version: 1.0.0
+date-released: "2026-11-25"
+license: MIT
+keywords:
+  - uplift modeling
+  - causal inference
+  - marketing
+  - RFM
+  - LLM agent

@@ -249,6 +249,37 @@ def test_scripted_agent_runs_full_workflow_and_waits_for_human(engine, tmp_path)
     assert events.count("tool") == len(run.steps) and "answer" in events
 
 
+def test_invented_arguments_are_dropped_by_the_provenance_guard():
+    said = "Plan a campaign. A message costs 6 RUB, margin 25%, budget 1,000,000 BRL."
+    kept, dropped = Agent._provenance(
+        {
+            "contact_cost": 6,
+            "margin": 0.25,
+            "budget": 1000000,
+            "budget_currency": "BRL",
+            "discount": 0.03,
+            "fair_mode": True,
+        },
+        said,
+    )
+    assert kept == {"contact_cost": 6, "margin": 0.25, "budget": 1000000, "budget_currency": "BRL"}
+    assert dropped == {"discount": 0.03, "fair_mode": True}
+    kept, dropped = Agent._provenance(
+        {"contact_cost": 15, "discount": 0.03, "margin": 0.25, "budget_currency": "USD"},
+        "Plan our next campaign with the usual costs.",
+    )
+    assert kept == {} and set(dropped) == {"contact_cost", "discount", "margin", "budget_currency"}
+
+
+def test_demographic_targeting_is_refused(engine):
+    box = Toolbox(engine, offline=True)
+    res = box.call("plan_campaign", {"segments": ["Women over 60"]})
+    assert "personal attribute" in res["error"]
+    ok = box.call("plan_campaign", {"segments": ["Hibernating"]})
+    assert ok["customers_to_contact"] > 0
+    assert set(ok["contacted_by_rfm_segment"]) >= {"Hibernating"}
+
+
 def test_toolbox_returns_errors_as_data(engine):
     box = Toolbox(engine, offline=True)
     assert "error" in box.call("no_such_tool", {})

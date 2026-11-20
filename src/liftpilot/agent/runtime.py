@@ -26,7 +26,7 @@ from pathlib import Path
 from typing import Any
 
 from liftpilot import config
-from liftpilot.agent.grounding import GroundingReport, check_grounding
+from liftpilot.agent.grounding import GroundingReport, check_grounding, numbers_in
 from liftpilot.agent.llm import LLMUnavailable, OllamaClient
 from liftpilot.agent.report import overclaims, verified_statements
 from liftpilot.agent.tools import Toolbox
@@ -96,6 +96,7 @@ class AgentRun:
     seconds: float = 0.0
     messages: list[dict[str, Any]] = field(default_factory=list)
     error: str | None = None
+    said: str = ""  # everything the manager wrote in this conversation
     statements: list[str] = field(default_factory=list)
     overclaims: list[str] = field(default_factory=list)
     rejected_narrative: str | None = None
@@ -149,9 +150,52 @@ class Agent:
         self.max_steps = max_steps
 
     # ---------------------------------------------------------------- plumbing
+    @staticmethod
+    def _provenance(args: dict[str, Any], said: str) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Keep only planning assumptions the manager actually stated.
+
+        A language model asked to "use the usual costs" will happily supply a
+        cost of its own. Money assumptions are therefore accepted only if the
+        same number appears in the manager's words (as written, or as a
+        percentage); anything else is dropped and the system default applies.
+        """
+        stated = numbers_in(said)
+        text = said.lower()
+        kept: dict[str, Any] = {}
+        dropped: dict[str, Any] = {}
+        for key, value in args.items():
+            ok = True
+            if key in ("margin", "contact_cost", "discount", "budget", "safety_margin"):
+                try:
+                    v = float(value)
+                except (TypeError, ValueError):
+                    ok = False
+                else:
+                    ok = any(abs(v - s) < 1e-9 or abs(v * 100 - s) < 1e-6 for s in stated)
+            elif key == "budget_currency":
+                ok = str(value).lower() in text
+            elif key == "fair_mode":
+                ok = (
+                    (str(value).lower() not in ("true", "1", "yes"))
+                    or "fair" in text
+                    or ("equal" in text)
+                )
+            (kept if ok else dropped)[key] = value
+        if "budget" not in kept:
+            kept.pop("budget_currency", None)
+        return kept, dropped
+
     def _execute(self, run: AgentRun, name: str, args: dict[str, Any]) -> Any:
         start = time.perf_counter()
+        dropped: dict[str, Any] = {}
+        if name == "plan_campaign" and run.mode == "llm":
+            args, dropped = self._provenance(args, run.said or run.request)
         result = self.toolbox.call(name, args)
+        if dropped and isinstance(result, dict):
+            result["ignored_arguments"] = {
+                "values": dropped,
+                "reason": "not stated by the manager; system defaults were used instead",
+            }
         tool = self.toolbox.tools.get(name)
         step = Step(
             name,
@@ -259,6 +303,10 @@ class Agent:
         if self.llm is None or not self.llm.available():
             run.error = "local model not available; scripted planner used"
             return self.run_scripted(request, run=run)
+        run.said = " ".join(
+            [str(m.get("content", "")) for m in (history or []) if m.get("role") == "user"]
+            + [request]
+        )
         today = datetime.now(UTC).date().isoformat()
         messages: list[dict[str, Any]] = [
             {"role": "system", "content": SYSTEM_PROMPT + f"\nToday's date is {today}."},

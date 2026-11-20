@@ -58,6 +58,13 @@ def verified_statements(steps: list[Any], plan_id: str | None) -> list[str]:
         )
         + "."
     )
+    ignored = plan.get("ignored_arguments", {}).get("values")
+    if ignored:
+        out.append(
+            "The model proposed assumptions the manager never stated ("
+            + ", ".join(f"{k} = {v}" for k, v in ignored.items())
+            + "); they were ignored and the system defaults were used."
+        )
     conv = plan.get("budget_conversion")
     if conv and "from" in conv:
         out.append(

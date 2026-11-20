@@ -1,0 +1,470 @@
+{
+  "fairness_by_cost": [
+    {
+      "cost": 2.0,
+      "share": 0.6987,
+      "rates": {
+        "18-24": 0.6096,
+        "25-34": 0.7049,
+        "35-44": 0.7052,
+        "45-54": 0.715,
+        "55-64": 0.7151,
+        "65+": 0.6893,
+        "unknown": 0.7199
+      },
+      "ratio": 0.852,
+      "flag": false,
+      "lowest": "18-24",
+      "highest": "55-64",
+      "gender_ratio": 0.988,
+      "measured_uplift_by_age": {
+        "18-24": 0.0139,
+        "25-34": 0.0158,
+        "35-44": 0.0306,
+        "45-54": 0.0338,
+        "55-64": 0.0401,
+        "65+": 0.059,
+        "unknown": 0.0402
+      },
+      "measured_uplift_by_gender": {
+        "female": 0.0403,
+        "male": 0.0293,
+        "unknown": 0.029
+      }
+    },
+    {
+      "cost": 4.0,
+      "share": 0.3975,
+      "rates": {
+        "18-24": 0.3166,
+        "25-34": 0.411,
+        "35-44": 0.421,
+        "45-54": 0.4194,
+        "55-64": 0.4009,
+        "65+": 0.3609,
+        "unknown": 0.3962
+      },
+      "ratio": 0.752,
+      "flag": true,
+      "lowest": "18-24",
+      "highest": "35-44",
+      "gender_ratio": 0.968,
+      "measured_uplift_by_age": {
+        "18-24": 0.0139,
+        "25-34": 0.0158,
+        "35-44": 0.0306,
+        "45-54": 0.0338,
+        "55-64": 0.0401,
+        "65+": 0.059,
+        "unknown": 0.0402
+      },
+      "measured_uplift_by_gender": {
+        "female": 0.0403,
+        "male": 0.0293,
+        "unknown": 0.029
+      }
+    },
+    {
+      "cost": 6.0,
+      "share": 0.1904,
+      "rates": {
+        "18-24": 0.1466,
+        "25-34": 0.1899,
+        "35-44": 0.2078,
+        "45-54": 0.2059,
+        "55-64": 0.1914,
+        "65+": 0.1708,
+        "unknown": 0.2009
+      },
+      "ratio": 0.705,
+      "flag": true,
+      "lowest": "18-24",
+      "highest": "35-44",
+      "gender_ratio": 0.951,
+      "measured_uplift_by_age": {
+        "18-24": 0.0139,
+        "25-34": 0.0158,
+        "35-44": 0.0306,
+        "45-54": 0.0338,
+        "55-64": 0.0401,
+        "65+": 0.059,
+        "unknown": 0.0402
+      },
+      "measured_uplift_by_gender": {
+        "female": 0.0403,
+        "male": 0.0293,
+        "unknown": 0.029
+      }
+    },
+    {
+      "cost": 10.0,
+      "share": 0.0459,
+      "rates": {
+        "18-24": 0.0263,
+        "25-34": 0.0455,
+        "35-44": 0.0547,
+        "45-54": 0.0521,
+        "55-64": 0.0467,
+        "65+": 0.0362,
+        "unknown": 0.0446
+      },
+      "ratio": 0.481,
+      "flag": true,
+      "lowest": "18-24",
+      "highest": "35-44",
+      "gender_ratio": 0.904,
+      "measured_uplift_by_age": {
+        "18-24": 0.0139,
+        "25-34": 0.0158,
+        "35-44": 0.0306,
+        "45-54": 0.0338,
+        "55-64": 0.0401,
+        "65+": 0.059,
+        "unknown": 0.0402
+      },
+      "measured_uplift_by_gender": {
+        "female": 0.0403,
+        "male": 0.0293,
+        "unknown": 0.029
+      }
+    }
+  ],
+  "fair_mode": [
+    {
+      "cost": 2.0,
+      "fair_mode": false,
+      "contacted": 139828,
+      "share": 0.6987,
+      "real_profit": 363138.0,
+      "ci": [
+        130803.0,
+        603439.0
+      ],
+      "p_positive": 1.0,
+      "age_ratio": 0.852,
+      "gender_ratio": 0.988
+    },
+    {
+      "cost": 2.0,
+      "fair_mode": true,
+      "contacted": 145144,
+      "share": 0.7253,
+      "real_profit": 341133.0,
+      "ci": [
+        108178.0,
+        585710.0
+      ],
+      "p_positive": 1.0,
+      "age_ratio": 0.874,
+      "gender_ratio": 0.982
+    },
+    {
+      "cost": 6.0,
+      "fair_mode": false,
+      "contacted": 38113,
+      "share": 0.1904,
+      "real_profit": 99838.0,
+      "ci": [
+        -99289.0,
+        296175.0
+      ],
+      "p_positive": 0.83,
+      "age_ratio": 0.705,
+      "gender_ratio": 0.951
+    },
+    {
+      "cost": 6.0,
+      "fair_mode": true,
+      "contacted": 23925,
+      "share": 0.1196,
+      "real_profit": 43565.0,
+      "ci": [
+        -25589.0,
+        120655.0
+      ],
+      "p_positive": 0.9,
+      "age_ratio": 0.654,
+      "gender_ratio": 0.916
+    }
+  ],
+  "cost_frontier": [
+    {
+      "cost": 1.0,
+      "share": 0.7502,
+      "contacted": 150139,
+      "plan_profit": 484065.0,
+      "plan_ci": [
+        241700.0,
+        747523.0
+      ],
+      "plan_p_positive": 1.0,
+      "everyone_profit": 578150.0,
+      "everyone_ci": [
+        296761.0,
+        890437.0
+      ],
+      "gain": -94085.0,
+      "spend_saved": 51066.0,
+      "plan_spend": 149057.0,
+      "iroas": 16.99
+    },
+    {
+      "cost": 2.0,
+      "share": 0.6987,
+      "contacted": 139828,
+      "plan_profit": 363138.0,
+      "plan_ci": [
+        141047.0,
+        603291.0
+      ],
+      "plan_p_positive": 0.99,
+      "everyone_profit": 378027.0,
+      "everyone_ci": [
+        96638.0,
+        690314.0
+      ],
+      "gain": -14889.0,
+      "spend_saved": 122731.0,
+      "plan_spend": 277515.0,
+      "iroas": 9.23
+    },
+    {
+      "cost": 3.0,
+      "share": 0.5872,
+      "contacted": 117508,
+      "plan_profit": 222820.0,
+      "plan_ci": [
+        1732.0,
+        459155.0
+      ],
+      "plan_p_positive": 0.97,
+      "everyone_profit": 177904.0,
+      "everyone_ci": [
+        -103485.0,
+        490191.0
+      ],
+      "gain": 44915.0,
+      "spend_saved": 249869.0,
+      "plan_spend": 350500.0,
+      "iroas": 6.54
+    },
+    {
+      "cost": 4.0,
+      "share": 0.3975,
+      "contacted": 79546,
+      "plan_profit": 121762.0,
+      "plan_ci": [
+        -106128.0,
+        347648.0
+      ],
+      "plan_p_positive": 0.88,
+      "everyone_profit": -22219.0,
+      "everyone_ci": [
+        -303608.0,
+        290068.0
+      ],
+      "gain": 143981.0,
+      "spend_saved": 482060.0,
+      "plan_spend": 318432.0,
+      "iroas": 5.53
+    },
+    {
+      "cost": 5.0,
+      "share": 0.263,
+      "contacted": 52626,
+      "plan_profit": 128510.0,
+      "plan_ci": [
+        -95592.0,
+        343092.0
+      ],
+      "plan_p_positive": 0.91,
+      "everyone_profit": -222342.0,
+      "everyone_ci": [
+        -503731.0,
+        89945.0
+      ],
+      "gain": 350851.0,
+      "spend_saved": 737181.0,
+      "plan_spend": 263434.0,
+      "iroas": 5.95
+    },
+    {
+      "cost": 6.0,
+      "share": 0.1904,
+      "contacted": 38113,
+      "plan_profit": 99838.0,
+      "plan_ci": [
+        -114276.0,
+        299621.0
+      ],
+      "plan_p_positive": 0.83,
+      "everyone_profit": -422465.0,
+      "everyone_ci": [
+        -703854.0,
+        -110178.0
+      ],
+      "gain": 522303.0,
+      "spend_saved": 972403.0,
+      "plan_spend": 228335.0,
+      "iroas": 5.75
+    },
+    {
+      "cost": 8.0,
+      "share": 0.0968,
+      "contacted": 19374,
+      "plan_profit": 60300.0,
+      "plan_ci": [
+        -110402.0,
+        227237.0
+      ],
+      "plan_p_positive": 0.78,
+      "everyone_profit": -822711.0,
+      "everyone_ci": [
+        -1104100.0,
+        -510424.0
+      ],
+      "gain": 883011.0,
+      "spend_saved": 1443639.0,
+      "plan_spend": 157345.0,
+      "iroas": 5.53
+    },
+    {
+      "cost": 10.0,
+      "share": 0.0459,
+      "contacted": 9181,
+      "plan_profit": -9457.0,
+      "plan_ci": [
+        -152617.0,
+        145963.0
+      ],
+      "plan_p_positive": 0.51,
+      "everyone_profit": -1222957.0,
+      "everyone_ci": [
+        -1504346.0,
+        -910670.0
+      ],
+      "gain": 1213500.0,
+      "spend_saved": 1910092.0,
+      "plan_spend": 91138.0,
+      "iroas": 3.58
+    }
+  ],
+  "retention_ltv": {
+    "months_used": [
+      "2018-12",
+      "2019-01",
+      "2019-02"
+    ],
+    "pairs": [
+      "2018-12->2019-01",
+      "2019-01->2019-02"
+    ],
+    "segments": {
+      "Hibernating": {
+        "customers": 120597,
+        "monthly_churn": 0.22308509875263263,
+        "monthly_retention": 0.7769149012473674,
+        "orders_per_active_month": 2.411371785006794,
+        "average_order_value": 403.3870216207592,
+        "expected_lifetime_months": 4.482594335486511,
+        "ltv_gross_profit": 1090.0729002218322
+      },
+      "Champions": {
+        "customers": 87792,
+        "monthly_churn": 0.005752659137335932,
+        "monthly_retention": 0.9942473408626641,
+        "orders_per_active_month": 10.31081767788635,
+        "average_order_value": 415.03631709653297,
+        "expected_lifetime_months": 36.0,
+        "ltv_gross_profit": 38514.27415755399
+      },
+      "Potential loyalists": {
+        "customers": 49255,
+        "monthly_churn": 0.04181124017963864,
+        "monthly_retention": 0.9581887598203613,
+        "orders_per_active_month": 4.614176056021906,
+        "average_order_value": 349.6765661056523,
+        "expected_lifetime_months": 23.91701359977796,
+        "ltv_gross_profit": 9647.341431063278
+      },
+      "Loyal": {
+        "customers": 26624,
+        "monthly_churn": 0.006215575275397797,
+        "monthly_retention": 0.9937844247246022,
+        "orders_per_active_month": 8.27404181848189,
+        "average_order_value": 500.0472766970776,
+        "expected_lifetime_months": 36.0,
+        "ltv_gross_profit": 37236.70870748645
+      },
+      "At risk": {
+        "customers": 42979,
+        "monthly_churn": 0.02689756369677787,
+        "monthly_retention": 0.9731024363032221,
+        "orders_per_active_month": 5.037967355471577,
+        "average_order_value": 493.2125146032698,
+        "expected_lifetime_months": 36.0,
+        "ltv_gross_profit": 22363.096930931897
+      },
+      "New customers": {
+        "customers": 23018,
+        "monthly_churn": 0.20590753424657535,
+        "monthly_retention": 0.7940924657534246,
+        "orders_per_active_month": 2.3801161536166013,
+        "average_order_value": 319.0462299271833,
+        "expected_lifetime_months": 4.856548856548857,
+        "ltv_gross_profit": 921.9758378180802
+      },
+      "Need attention": {
+        "customers": 38464,
+        "monthly_churn": 0.060801575520641964,
+        "monthly_retention": 0.9391984244793581,
+        "orders_per_active_month": 3.9712856418644247,
+        "average_order_value": 403.4328307072011,
+        "expected_lifetime_months": 16.446942228668117,
+        "ltv_gross_profit": 6587.604820784227
+      },
+      "Cannot lose them": {
+        "customers": 11433,
+        "monthly_churn": 0.005367519850951515,
+        "monthly_retention": 0.9946324801490485,
+        "orders_per_active_month": 9.768407079646018,
+        "average_order_value": 507.2986621430232,
+        "expected_lifetime_months": 36.0,
+        "ltv_gross_profit": 44599.49858495574
+      }
+    },
+    "all": {
+      "customers": 400162,
+      "monthly_churn": 0.07699558646192207,
+      "monthly_retention": 0.9230044135380779,
+      "orders_per_active_month": 5.869438137533964,
+      "average_order_value": 427.2181793169257,
+      "expected_lifetime_months": 12.987757428077346,
+      "ltv_gross_profit": 8141.8000367159975
+    }
+  },
+  "fx": {
+    "base": "RUB",
+    "rates": {
+      "BRL": 0.071042,
+      "EUR": 0.011069,
+      "LBP": 1097.36,
+      "USD": 0.012157
+    },
+    "as_of": "2026-11-19",
+    "source": "Frankfurter (central-bank reference rates)",
+    "live": true
+  },
+  "brl_budget": {
+    "amount": 14076100.0,
+    "currency": "RUB",
+    "rate": 14.0761,
+    "from": {
+      "amount": 1000000,
+      "currency": "BRL"
+    },
+    "as_of": "2026-11-19",
+    "source": "Frankfurter (central-bank reference rates)",
+    "live": true
+  }
+}

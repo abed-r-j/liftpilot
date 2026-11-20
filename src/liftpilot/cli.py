@@ -191,6 +191,32 @@ def agent(
         console.print(f"[yellow]waiting for human approval of {run.pending_approval}[/yellow]")
 
 
+@app.command()
+def results(offline: bool = False) -> None:
+    """Run the extra analyses and regenerate docs/RESULTS.md and docs/figures/."""
+    from liftpilot import figures
+    from liftpilot import results as res
+
+    res.extra_analyses("x5", offline=offline)
+    path = res.write_results_md()
+    names = figures.make_all()
+    console.print(f"wrote {path} and {len(names)} figures")
+
+
+@app.command(name="agent-eval")
+def agent_eval(dataset: str = "x5", offline: bool = False) -> None:
+    """Benchmark the agent on fixed requests; writes artifacts/agent_eval.json."""
+    from liftpilot.agent.evaluate import run_benchmark
+    from liftpilot.agent.runtime import build_agent
+
+    ag = build_agent(dataset, use_llm=True, offline=offline)
+    res = run_benchmark(ag, config.root() / "artifacts" / "agent_eval.json")
+    for r in res["runs"]:
+        console.print(json.dumps(r, default=str), markup=False)
+    console.rule("summary")
+    console.print(json.dumps(res["summary"], indent=2), markup=False)
+
+
 @app.command(name="app")
 def run_app(port: int = 8501) -> None:
     """Start the demo dashboard."""
