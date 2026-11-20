@@ -22,7 +22,8 @@ from liftpilot.agent.runtime import Agent, AuditLog
 from liftpilot.agent.tools import Toolbox
 from liftpilot.engine import ApprovalRequired, CampaignEngine
 
-INK, MUTED, GRID = "#1b1f3b", "#6b7280", "#e5e7eb"
+# mid-greys that stay visible on both the light and the dark theme
+INK, MUTED, GRID = "#8b93a7", "#6b7280", "rgba(128,128,128,0.25)"
 BLUE, TEAL, AMBER, RED, VIOLET, GREY = (
     "#2563eb",
     "#0d9488",
@@ -47,15 +48,15 @@ st.markdown(
     """
     <style>
     .block-container {padding-top: 4.2rem; max-width: 1280px;}
-    div[data-testid="stMetric"] {background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px;
-        padding:12px 16px;}
+    div[data-testid="stMetric"] {background:rgba(128,128,128,.10);
+        border:1px solid rgba(128,128,128,.28); border-radius:12px; padding:12px 16px;}
     div[data-testid="stMetricValue"] {font-size:1.55rem;}
     .pill {display:inline-block; padding:2px 10px; border-radius:999px; font-size:.78rem;
         font-weight:600; margin-right:6px;}
     .ok {background:#dcfce7; color:#166534;} .warn {background:#fef3c7; color:#92400e;}
     .bad {background:#fee2e2; color:#991b1b;} .info {background:#dbeafe; color:#1e40af;}
-    .note {color:#6b7280; font-size:.86rem;}
-    .formula {background:#f1f5f9; border-left:4px solid #2563eb; padding:10px 14px;
+    .note {opacity:.72; font-size:.86rem;}
+    .formula {background:rgba(128,128,128,.12); border-left:4px solid #2563eb; padding:10px 14px;
         border-radius:6px; font-family:ui-monospace,Consolas,monospace; font-size:.9rem;}
     </style>
     """,
@@ -117,14 +118,15 @@ def style(fig: go.Figure, height: int = 360, **layout: Any) -> go.Figure:
     fig.update_layout(
         height=height,
         margin={"l": 10, "r": 10, "t": 40, "b": 10},
-        plot_bgcolor="white",
-        paper_bgcolor="white",
-        font={"color": INK, "size": 13},
+        # transparent, and no fixed text colour: the app theme (light or dark) supplies both
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font={"size": 13},
         legend={"orientation": "h", "y": -0.2},
         **layout,
     )
     fig.update_xaxes(gridcolor=GRID, zerolinecolor=GRID)
-    fig.update_yaxes(gridcolor=GRID, zerolinecolor="#9ca3af")
+    fig.update_yaxes(gridcolor=GRID, zerolinecolor="rgba(128,128,128,0.6)")
     return fig
 
 
