@@ -53,11 +53,18 @@ anything is sent."*
    currency (the course brief's R$ 1 million) into the data's currency; a public-holiday calendar
    (Nager.Date) sets the send date and measurement window. Both are cached for offline use. Live
    feeds never change the uplift scores.
-9. **Ethics, measured.** Age and gender are never model inputs. The fairness audit still found
-   that as contact cost rises, 18-24 year-olds are selected less (ratio 0.85 at 2 RUB, 0.70 at 6 RUB,
-   0.48 at 10 RUB) and it flags this for human review. The gap follows a real difference in measured
-   effect (+1.4 points for 18-24 versus +5.9 for 65+). A "fair mode" (value every customer at the
-   average basket) did not close the gap and roughly halved profit at 6 RUB: reported as a negative result.
+9. **Ethics, measured.** Age and gender are never model inputs. Minors are never contacted (rule)
+   and are kept out of the audit. Among adults the fairness audit finds a small age gap at low cost
+   that widens as contact gets expensive: lowest-to-highest selection ratio 0.96 at 2 RUB, 0.86 at
+   4 RUB, 0.82 at 6 RUB (none flagged) and 0.57 at 10 RUB, where 18-24 year-olds are selected least
+   and the plan is flagged for human review. The gap follows a real difference in measured effect
+   (+1.1 points for 18-24 versus +5.9 for 65+). A "fair mode" (value every customer at the average
+   basket) did not help: at 6 RUB it lowered the ratio to 0.58 and roughly halved profit. Reported
+   as a negative result. An earlier version of the audit counted excluded minors inside the 18-24
+   band and overstated the gap (0.85 / 0.70 / 0.48); a code review caught it. Say this if asked: it
+   is a good example of why the audit itself needs review.
+   Agent benchmark (final code): see section 10 of RESULTS.md. A full plan takes about 50 seconds
+   on a cool laptop and two minutes or more when the GPU is hot or shared (benchmark median 136 s).
 10. **External check.** On the Hillstrom e-mail test (64,000 customers, real spend in USD) the
     effect is nearly uniform across customers, uplift rankings are unstable, and the right answer
     is all-or-nothing; the profit rule finds the switch (send to all at 0.10 USD, to nobody at

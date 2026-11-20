@@ -1,7 +1,7 @@
 {
   "dataset": {
     "name": "x5",
-    "description": "X5 Retail Group (RetailHero 2019): randomised SMS communication to loyalty-card holders of a grocery chain; outcome = purchase after the message.",
+    "description": "X5 Retail Group (RetailHero 2019): a marketing communication sent at random to half of the loyalty-card holders of a grocery chain; outcome = purchase afterwards.",
     "currency": "RUB",
     "customers_total": 400162,
     "customers_in_experiment": 200039,
@@ -44,7 +44,7 @@
   },
   "learners": {
     "response": {
-      "fit_seconds": 1.83,
+      "fit_seconds": 1.55,
       "qini_calibration": -0.011319064383666233,
       "qini_test": {
         "value": -0.005210631427726064,
@@ -58,7 +58,7 @@
       "uplift_bottom_30": 0.0408480066711569
     },
     "s_learner": {
-      "fit_seconds": 3.24,
+      "fit_seconds": 2.71,
       "qini_calibration": 0.019921442174843377,
       "qini_test": {
         "value": 0.008875495511347059,
@@ -72,7 +72,7 @@
       "uplift_bottom_30": 0.029255026102410264
     },
     "t_learner": {
-      "fit_seconds": 3.09,
+      "fit_seconds": 3.4,
       "qini_calibration": 0.013056905486476828,
       "qini_test": {
         "value": 0.009223067232551492,
@@ -86,7 +86,7 @@
       "uplift_bottom_30": 0.019843033885841632
     },
     "x_learner": {
-      "fit_seconds": 6.3,
+      "fit_seconds": 7.59,
       "qini_calibration": 0.018736848945593295,
       "qini_test": {
         "value": 0.0073271720490824125,
@@ -100,7 +100,7 @@
       "uplift_bottom_30": 0.029112229940730372
     },
     "dr_learner": {
-      "fit_seconds": 10.04,
+      "fit_seconds": 12.15,
       "qini_calibration": 0.014590722812503973,
       "qini_test": {
         "value": 0.009809992401330361,
@@ -114,7 +114,7 @@
       "uplift_bottom_30": 0.02404582261018351
     },
     "class_transformation": {
-      "fit_seconds": 2.25,
+      "fit_seconds": 2.46,
       "qini_calibration": 0.014610332384506238,
       "qini_test": {
         "value": 0.008219539128600543,
@@ -128,7 +128,7 @@
       "uplift_bottom_30": 0.019828228330162845
     },
     "ensemble": {
-      "fit_seconds": 6.39,
+      "fit_seconds": 6.13,
       "qini_calibration": 0.017898869071114213,
       "qini_test": {
         "value": 0.00896941280404872,
@@ -893,13 +893,13 @@
       "groups": [
         {
           "group": "18-24",
-          "customers": 3229,
-          "selected": 2298,
-          "selection_rate": 0.7116754413,
+          "customers": 2758,
+          "selected": 1946,
+          "selection_rate": 0.7055837563,
           "small_group": false,
-          "observed_uplift": 0.0037948836,
-          "uplift_se": 0.0174050638,
-          "rate_vs_overall": 1.0135522945
+          "observed_uplift": 0.0098324072,
+          "uplift_se": 0.0188109133,
+          "rate_vs_overall": 1.0048766526
         },
         {
           "group": "25-34",
@@ -950,6 +950,16 @@
           "observed_uplift": 0.0533433124,
           "uplift_se": 0.0120825326,
           "rate_vs_overall": 0.9760763885
+        },
+        {
+          "group": "under 18",
+          "customers": 471,
+          "selected": 352,
+          "selection_rate": 0.7473460722,
+          "small_group": false,
+          "observed_uplift": -0.0310807884,
+          "uplift_se": 0.0458952016,
+          "rate_vs_overall": 1.0643536116
         },
         {
           "group": "unknown",

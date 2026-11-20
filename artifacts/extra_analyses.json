@@ -4,26 +4,28 @@
       "cost": 2.0,
       "share": 0.6987,
       "rates": {
-        "18-24": 0.6096,
+        "18-24": 0.7195,
         "25-34": 0.7049,
         "35-44": 0.7052,
         "45-54": 0.715,
         "55-64": 0.7151,
         "65+": 0.6893,
+        "under 18": 0.0,
         "unknown": 0.7199
       },
-      "ratio": 0.852,
+      "ratio": 0.958,
       "flag": false,
-      "lowest": "18-24",
-      "highest": "55-64",
+      "lowest": "65+",
+      "highest": "18-24",
       "gender_ratio": 0.988,
       "measured_uplift_by_age": {
-        "18-24": 0.0139,
+        "18-24": 0.011,
         "25-34": 0.0158,
         "35-44": 0.0306,
         "45-54": 0.0338,
         "55-64": 0.0401,
         "65+": 0.059,
+        "under 18": 0.0314,
         "unknown": 0.0402
       },
       "measured_uplift_by_gender": {
@@ -36,26 +38,28 @@
       "cost": 4.0,
       "share": 0.3975,
       "rates": {
-        "18-24": 0.3166,
+        "18-24": 0.3737,
         "25-34": 0.411,
         "35-44": 0.421,
         "45-54": 0.4194,
         "55-64": 0.4009,
         "65+": 0.3609,
+        "under 18": 0.0,
         "unknown": 0.3962
       },
-      "ratio": 0.752,
-      "flag": true,
-      "lowest": "18-24",
+      "ratio": 0.857,
+      "flag": false,
+      "lowest": "65+",
       "highest": "35-44",
       "gender_ratio": 0.968,
       "measured_uplift_by_age": {
-        "18-24": 0.0139,
+        "18-24": 0.011,
         "25-34": 0.0158,
         "35-44": 0.0306,
         "45-54": 0.0338,
         "55-64": 0.0401,
         "65+": 0.059,
+        "under 18": 0.0314,
         "unknown": 0.0402
       },
       "measured_uplift_by_gender": {
@@ -68,26 +72,28 @@
       "cost": 6.0,
       "share": 0.1904,
       "rates": {
-        "18-24": 0.1466,
+        "18-24": 0.173,
         "25-34": 0.1899,
         "35-44": 0.2078,
         "45-54": 0.2059,
         "55-64": 0.1914,
         "65+": 0.1708,
+        "under 18": 0.0,
         "unknown": 0.2009
       },
-      "ratio": 0.705,
-      "flag": true,
-      "lowest": "18-24",
+      "ratio": 0.822,
+      "flag": false,
+      "lowest": "65+",
       "highest": "35-44",
       "gender_ratio": 0.951,
       "measured_uplift_by_age": {
-        "18-24": 0.0139,
+        "18-24": 0.011,
         "25-34": 0.0158,
         "35-44": 0.0306,
         "45-54": 0.0338,
         "55-64": 0.0401,
         "65+": 0.059,
+        "under 18": 0.0314,
         "unknown": 0.0402
       },
       "measured_uplift_by_gender": {
@@ -100,26 +106,28 @@
       "cost": 10.0,
       "share": 0.0459,
       "rates": {
-        "18-24": 0.0263,
+        "18-24": 0.0311,
         "25-34": 0.0455,
         "35-44": 0.0547,
         "45-54": 0.0521,
         "55-64": 0.0467,
         "65+": 0.0362,
+        "under 18": 0.0,
         "unknown": 0.0446
       },
-      "ratio": 0.481,
+      "ratio": 0.567,
       "flag": true,
       "lowest": "18-24",
       "highest": "35-44",
       "gender_ratio": 0.904,
       "measured_uplift_by_age": {
-        "18-24": 0.0139,
+        "18-24": 0.011,
         "25-34": 0.0158,
         "35-44": 0.0306,
         "45-54": 0.0338,
         "55-64": 0.0401,
         "65+": 0.059,
+        "under 18": 0.0314,
         "unknown": 0.0402
       },
       "measured_uplift_by_gender": {
@@ -141,7 +149,7 @@
         603439.0
       ],
       "p_positive": 1.0,
-      "age_ratio": 0.852,
+      "age_ratio": 0.958,
       "gender_ratio": 0.988
     },
     {
@@ -155,7 +163,7 @@
         585710.0
       ],
       "p_positive": 1.0,
-      "age_ratio": 0.874,
+      "age_ratio": 0.933,
       "gender_ratio": 0.982
     },
     {
@@ -169,7 +177,7 @@
         296175.0
       ],
       "p_positive": 0.83,
-      "age_ratio": 0.705,
+      "age_ratio": 0.822,
       "gender_ratio": 0.951
     },
     {
@@ -183,7 +191,7 @@
         120655.0
       ],
       "p_positive": 0.9,
-      "age_ratio": 0.654,
+      "age_ratio": 0.577,
       "gender_ratio": 0.916
     }
   ],
@@ -374,9 +382,9 @@
         "monthly_churn": 0.005752659137335932,
         "monthly_retention": 0.9942473408626641,
         "orders_per_active_month": 10.31081767788635,
-        "average_order_value": 415.03631709653297,
+        "average_order_value": 415.03631709653285,
         "expected_lifetime_months": 36.0,
-        "ltv_gross_profit": 38514.27415755399
+        "ltv_gross_profit": 38514.27415755398
       },
       "Potential loyalists": {
         "customers": 49255,
@@ -392,27 +400,27 @@
         "monthly_churn": 0.006215575275397797,
         "monthly_retention": 0.9937844247246022,
         "orders_per_active_month": 8.27404181848189,
-        "average_order_value": 500.0472766970776,
+        "average_order_value": 500.04727669707773,
         "expected_lifetime_months": 36.0,
-        "ltv_gross_profit": 37236.70870748645
+        "ltv_gross_profit": 37236.708707486454
       },
       "At risk": {
         "customers": 42979,
         "monthly_churn": 0.02689756369677787,
         "monthly_retention": 0.9731024363032221,
         "orders_per_active_month": 5.037967355471577,
-        "average_order_value": 493.21251460326994,
+        "average_order_value": 493.2125146032698,
         "expected_lifetime_months": 36.0,
-        "ltv_gross_profit": 22363.0969309319
+        "ltv_gross_profit": 22363.096930931897
       },
       "New customers": {
         "customers": 23018,
         "monthly_churn": 0.20590753424657535,
         "monthly_retention": 0.7940924657534246,
         "orders_per_active_month": 2.3801161536166013,
-        "average_order_value": 319.04622992718333,
+        "average_order_value": 319.0462299271833,
         "expected_lifetime_months": 4.856548856548857,
-        "ltv_gross_profit": 921.9758378180803
+        "ltv_gross_profit": 921.9758378180802
       },
       "Need attention": {
         "customers": 38464,
@@ -446,19 +454,19 @@
   "fx": {
     "base": "RUB",
     "rates": {
-      "BRL": 0.071056,
-      "EUR": 0.011071,
-      "LBP": 1097.57,
-      "USD": 0.012159
+      "BRL": 0.071074,
+      "EUR": 0.011074,
+      "LBP": 1097.85,
+      "USD": 0.012162
     },
     "as_of": "2026-11-19",
     "source": "Frankfurter (central-bank reference rates)",
     "live": true
   },
   "brl_budget": {
-    "amount": 14073400.0,
+    "amount": 14069900.0,
     "currency": "RUB",
-    "rate": 14.0734,
+    "rate": 14.0699,
     "from": {
       "amount": 1000000,
       "currency": "BRL"
