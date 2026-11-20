@@ -2,12 +2,10 @@
 
 **An AI campaign agent that spends marketing budget only where it changes customer behaviour.**
 
-[![CI](https://github.com/<user>/liftpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/<user>/liftpilot/actions/workflows/ci.yml)
+[![CI](https://github.com/abed-r-j/liftpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/abed-r-j/liftpilot/actions/workflows/ci.yml)
 ![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
 
-`<user>` in the badge and in the clone address below is a placeholder for the GitHub account
-that publishes the repository as `<user>/liftpilot`. Replace it once the repository is public.
 
 Most marketing AI finds people who will buy. LiftPilot finds people who will buy *because you
 contacted them*, proves it on a real randomised experiment, and asks a human before anything is sent.
@@ -81,7 +79,7 @@ the downloads plus working space for the receipt aggregation, and, for the langu
 
 ```powershell
 # 0. get the code
-git clone https://github.com/<user>/liftpilot.git
+git clone https://github.com/abed-r-j/liftpilot.git
 cd liftpilot
 
 # 1. environment (Windows PowerShell; on Linux or macOS activate with: source .venv/bin/activate)

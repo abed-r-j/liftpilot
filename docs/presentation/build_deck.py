@@ -2325,7 +2325,7 @@ def s_close(d: Deck) -> None:
         5.3,
         6.5,
         0.75,
-        "Code, paper and every number: the liftpilot repository",
+        "Code, paper and every number: github.com/abed-r-j/liftpilot",
         size=18,
         bold=True,
         anchor=MSO_ANCHOR.MIDDLE,
