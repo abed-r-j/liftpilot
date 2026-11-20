@@ -2,6 +2,7 @@
 
 **An AI campaign agent that spends marketing budget only where it changes customer behaviour.**
 
+[![CI](https://github.com/abed-r-j/liftpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/abed-r-j/liftpilot/actions/workflows/ci.yml)
 ![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
 
