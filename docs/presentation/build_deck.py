@@ -1085,7 +1085,7 @@ def s_title(d: Deck) -> None:
                 ("Group 10:  ", {"color": MUTED}),
                 ("Abed El Rahmane Jaafir", {"bold": True}),
                 ("  and  ", {"color": MUTED}),
-                ("Ghandi Mahdmoud", {"bold": True}),
+                ("Ghandi Mahmoud", {"bold": True}),
             ],
             [("AI in Business and Marketing  |  Dr. Katia Raya", {"color": MUTED})],
             [("Saint Joseph University of Beirut  |  25 November 2026", {"color": MUTED})],
@@ -2490,7 +2490,7 @@ def s_close(d: Deck) -> None:
         6.3,
         10.8,
         0.4,
-        "Abed El Rahmane Jaafir and Ghandi Mahdmoud  |  Group 10",
+        "Abed El Rahmane Jaafir and Ghandi Mahmoud  |  Group 10",
         size=16,
         color=MUTED,
     )
@@ -3050,7 +3050,7 @@ def build() -> Path:
     s_check(d)
     core = d.prs.core_properties
     core.title = "LiftPilot: AI campaign agent for incremental profit"
-    core.author = "Abed El Rahmane Jaafir, Ghandi Mahdmoud"
+    core.author = "Abed El Rahmane Jaafir, Ghandi Mahmoud"
     core.subject = "AI in Business and Marketing, USJ, Group 10"
     out = HERE / "LiftPilot.pptx"
     d.prs.save(out)

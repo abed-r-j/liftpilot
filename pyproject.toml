@@ -7,7 +7,7 @@ requires-python = ">=3.11,<3.14"
 license = { text = "MIT" }
 authors = [
     { name = "Abed El Rahmane Jaafir" },
-    { name = "Ghandi Mahdmoud" },
+    { name = "Ghandi Mahmoud" },
 ]
 keywords = ["uplift modeling", "causal inference", "marketing", "RFM", "LLM agent"]
 classifiers = [

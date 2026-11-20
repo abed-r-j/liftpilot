@@ -5,7 +5,7 @@ Read this file, then `docs/RESULTS.md` (generated numbers) before writing anythi
 ## What the project is
 
 Course project, "AI in Business and Marketing", Saint Joseph University of Beirut (USJ),
-instructor Dr. Katia Raya. Group 10: **Abed El Rahmane Jaafir** and **Ghandi Mahdmoud**.
+instructor Dr. Katia Raya. Group 10: **Abed El Rahmane Jaafir** and **Ghandi Mahmoud**.
 Official topic: *AI-Powered Marketing Campaign Optimizer: Using Uplift Modeling & AI to Maximize
 Incremental Profit*. Presented on campus on 25 November 2026 by Abed alone, 15 minutes including
 a live demo. Judging criteria: Technical, Ethics, Communication, Concept, Metrics, AI integration.

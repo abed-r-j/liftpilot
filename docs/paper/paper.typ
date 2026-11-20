@@ -4,7 +4,7 @@
 // ---------------------------------------------------------------- layout
 #set document(
   title: "LiftPilot: Profit-Calibrated Uplift Targeting with a Guarded LLM Campaign Agent",
-  author: ("Abed El Rahmane Jaafir", "Ghandi Mahdmoud"),
+  author: ("Abed El Rahmane Jaafir", "Ghandi Mahmoud"),
 )
 #set page(
   paper: "us-letter",
@@ -163,7 +163,7 @@
       #emph[Faculty of Engineering (ESIB)] \
       #emph[Saint Joseph University of Beirut] \
       Beirut, Lebanon],
-    [#text(size: 11pt)[Ghandi Mahdmoud] \
+    [#text(size: 11pt)[Ghandi Mahmoud] \
       #emph[Faculty of Engineering (ESIB)] \
       #emph[Saint Joseph University of Beirut] \
       Beirut, Lebanon],
