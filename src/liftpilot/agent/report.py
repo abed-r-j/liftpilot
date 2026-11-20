@@ -68,7 +68,8 @@ def verified_statements(steps: list[Any], plan_id: str | None) -> list[str]:
     conv = plan.get("budget_conversion")
     if conv and "from" in conv:
         out.append(
-            f"Budget conversion (live rate): {_n(conv['from']['amount'])} "
+            f"Budget conversion ({'live' if conv.get('live') else 'cached'} rate, "
+            f"{conv.get('as_of', 'date unknown')}): {_n(conv['from']['amount'])} "
             f"{conv['from']['currency']} = {_n(conv['amount'])} {cur}."
         )
     out.append(
@@ -107,7 +108,8 @@ def verified_statements(steps: list[Any], plan_id: str | None) -> list[str]:
             f"If everyone were contacted instead: incremental profit "
             f"{_n(ev['contact_everyone_incremental_profit'])} {cur} for a spend of "
             f"{_n(ev['contact_everyone_spend'])} {cur}. The plan earns "
-            f"{_n(ev['profit_gain_vs_contact_everyone'])} {cur} more and spends "
+            f"{_n(abs(ev['profit_gain_vs_contact_everyone']))} {cur} "
+            f"{'more' if ev['profit_gain_vs_contact_everyone'] >= 0 else 'less'} and spends "
             f"{_n(ev['spend_saved_vs_contact_everyone'])} {cur} less."
         )
         if ev.get("real_incremental_roas") is not None:
@@ -116,10 +118,16 @@ def verified_statements(steps: list[Any], plan_id: str | None) -> list[str]:
                 f"per unit of spend); a campaign breaks even at {ev['break_even_roas']:.2f}."
             )
         if lo < 0 < hi:
+            likely = ev["probability_profit_positive"] > 0.5 and ev["real_incremental_profit"] > 0
             out.append(
                 "The interval includes zero: the plan is more likely than not to be profitable, "
                 "but this is not statistically certain."
+                if likely
+                else "The interval includes zero and the estimate is not clearly positive: on "
+                "this evidence the plan cannot be expected to make money."
             )
+        elif hi <= 0:
+            out.append("The whole interval is below zero: the replay shows this plan loses money.")
     fair = r.get("audit_fairness")
     if fair:
         parts, flagged = [], []
@@ -155,16 +163,22 @@ def verified_statements(steps: list[Any], plan_id: str | None) -> list[str]:
     sched = r.get("schedule_campaign")
     if sched and sched.get("recommended_send_date"):
         hol = sched.get("holidays_inside_window") or []
-        out.append(
-            f"Send date: {sched['recommended_send_date']} "
-            f"({'live' if sched.get('live') else 'cached'} holiday calendar); "
-            + (
-                f"public holidays inside the measurement window: "
-                f"{', '.join(h['date'] for h in hol)}."
-                if hol
-                else "no public holiday inside the measurement window."
+        if not sched.get("calendar_known", True):
+            out.append(
+                f"Send date: {sched['recommended_send_date']}. The holiday calendar was not "
+                "available (no connection, no cache): only weekends were avoided."
             )
-        )
+        else:
+            out.append(
+                f"Send date: {sched['recommended_send_date']} "
+                f"({'live' if sched.get('live') else 'cached'} holiday calendar); "
+                + (
+                    f"public holidays inside the measurement window: "
+                    f"{', '.join(h['date'] for h in hol)}."
+                    if hol
+                    else "no public holiday inside the measurement window."
+                )
+            )
     drafts = r.get("draft_messages", {}).get("messages")
     if drafts:
         ok = all(m["passed_checks"] for m in drafts.values())

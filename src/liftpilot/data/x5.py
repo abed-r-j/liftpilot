@@ -15,7 +15,7 @@ Three public files (X5 Retail Group, RetailHero 2019 uplift competition):
   BEFORE the campaign (every line of every receipt).
 
 This module turns the raw receipts into one row per customer with honest
-Recency / Frequency / Monetary features, using DuckDB so that the 640 MB file
+Recency / Frequency / Monetary features, using DuckDB so that the 670 MB file
 is streamed from disk instead of loaded into memory.
 
 Leakage guard: ``first_redeem_date`` runs past the end of the purchase history

@@ -1,4 +1,4 @@
-"""Command line: ``liftpilot download | train | report | agent | app``."""
+"""Command line: ``liftpilot download | train | report | results | agent | agent-eval | app``."""
 
 from __future__ import annotations
 

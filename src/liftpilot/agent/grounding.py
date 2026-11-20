@@ -22,6 +22,34 @@ NUM = re.compile(
 ID_LIKE = re.compile(r"\b(plan-[0-9a-f]{8}|[0-9a-f]{10}|\d{4}-\d{2}-\d{2}|h\d{5})\b", re.IGNORECASE)
 SCALE = {"k": 1e3, "thousand": 1e3, "m": 1e6, "million": 1e6, "bn": 1e9, "billion": 1e9}
 ALWAYS_OK = {float(i) for i in range(0, 11)} | {95.0, 100.0}
+MAX_RELATIVE_ROUNDING = 0.02
+
+CURRENCY_WORDS: dict[str, tuple[str, ...]] = {
+    "BRL": ("brl", "reais", "real ", "r$"),
+    "USD": ("usd", "dollar", "us$"),
+    "EUR": ("eur", "euro", "€"),
+    "RUB": ("rub", "rouble", "ruble", "₽"),
+    "LBP": ("lbp", "lebanese pound", "lira"),
+    "GBP": ("gbp", "pound sterling", "£"),
+}
+
+SPACED = re.compile(r"(?<![\d.,])(\d{1,3}(?:[  ]\d{3})+)(?![\d])")
+
+
+def stated_amounts(text: str) -> set[float]:
+    """Numbers a person wrote, read the way a person means them:
+    '1,000,000', '1 000 000', '1 million', '50k' and '25%' (as 25)."""
+    found: set[float] = set()
+    clean = ID_LIKE.sub(" ", text)
+    for m in SPACED.finditer(clean):
+        found.add(float(re.sub(r"[  ]", "", m.group(1))))
+    for m in NUM.finditer(clean):
+        value = float(m.group(1).replace(",", ""))
+        unit = (m.group(2) or "").lower()
+        found.add(value)
+        if unit in SCALE:
+            found.add(value * SCALE[unit])
+    return found
 
 
 @dataclass
@@ -83,7 +111,9 @@ def _matches(value: float, unit: str, step: float, allowed: set[float]) -> bool:
     else:
         forms.append((value / 100.0, step / 100.0))  # "3.3 points" without the % sign
     for v, s in forms:
-        tol = 0.5 * s * (1 + 1e-9) + 1e-12
+        # half of the last kept digit, but never more than 2% of the value: trailing
+        # zeros may be rounding ("740,000" for 739,812) yet "30%" is not "25%"
+        tol = min(0.5 * s, MAX_RELATIVE_ROUNDING * abs(v)) * (1 + 1e-9) + 1e-12
         for a in allowed:
             if abs(abs(v) - abs(a)) <= tol:
                 return True

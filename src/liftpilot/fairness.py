@@ -59,8 +59,14 @@ def audit_groups(
     return out
 
 
-def disparate_impact(table: pd.DataFrame, ignore: tuple[str, ...] = ("unknown",)) -> dict[str, Any]:
-    """Lowest / highest selection rate among known, large-enough groups."""
+def disparate_impact(
+    table: pd.DataFrame, ignore: tuple[str, ...] = ("unknown", "under 18")
+) -> dict[str, Any]:
+    """Lowest / highest selection rate among known, large-enough groups.
+
+    Groups that a rule excludes from contact altogether (minors) are left out:
+    their rate is zero by policy, not because of the model.
+    """
     use = table[~table.index.isin(ignore) & ~table["small_group"]]
     if len(use) < 2 or use["selection_rate"].max() == 0:
         return {"ratio": None, "flag": False, "lowest": None, "highest": None}

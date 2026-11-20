@@ -401,18 +401,18 @@
         "monthly_churn": 0.02689756369677787,
         "monthly_retention": 0.9731024363032221,
         "orders_per_active_month": 5.037967355471577,
-        "average_order_value": 493.2125146032698,
+        "average_order_value": 493.21251460326994,
         "expected_lifetime_months": 36.0,
-        "ltv_gross_profit": 22363.096930931897
+        "ltv_gross_profit": 22363.0969309319
       },
       "New customers": {
         "customers": 23018,
         "monthly_churn": 0.20590753424657535,
         "monthly_retention": 0.7940924657534246,
         "orders_per_active_month": 2.3801161536166013,
-        "average_order_value": 319.0462299271833,
+        "average_order_value": 319.04622992718333,
         "expected_lifetime_months": 4.856548856548857,
-        "ltv_gross_profit": 921.9758378180802
+        "ltv_gross_profit": 921.9758378180803
       },
       "Need attention": {
         "customers": 38464,
@@ -446,24 +446,24 @@
   "fx": {
     "base": "RUB",
     "rates": {
-      "BRL": 0.071042,
-      "EUR": 0.011069,
-      "LBP": 1097.36,
-      "USD": 0.012157
+      "BRL": 0.071056,
+      "EUR": 0.011071,
+      "LBP": 1097.57,
+      "USD": 0.012159
     },
     "as_of": "2026-11-19",
     "source": "Frankfurter (central-bank reference rates)",
     "live": true
   },
   "brl_budget": {
-    "amount": 14076100.0,
+    "amount": 14073400.0,
     "currency": "RUB",
-    "rate": 14.0761,
+    "rate": 14.0734,
     "from": {
       "amount": 1000000,
       "currency": "BRL"
     },
-    "as_of": "2026-11-19",
+    "as_of": "2026-11-20",
     "source": "Frankfurter (central-bank reference rates)",
     "live": true
   }

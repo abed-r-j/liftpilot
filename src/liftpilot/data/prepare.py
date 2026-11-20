@@ -51,8 +51,10 @@ X5_FEATURES = [
 # Never used as model inputs; kept only to audit who ends up being targeted.
 X5_AUDIT = ["age_band", "gender"]
 
-AGE_BINS = [0, 25, 35, 45, 55, 65, 200]
-AGE_LABELS = ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"]
+# Minors get their own band: they are never contacted (rule in the engine), so
+# mixing them into "18-24" would make that band look under-served by the model.
+AGE_BINS = [0, 18, 25, 35, 45, 55, 65, 200]
+AGE_LABELS = ["under 18", "18-24", "25-34", "35-44", "45-54", "55-64", "65+"]
 
 
 @dataclass

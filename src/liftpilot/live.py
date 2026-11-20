@@ -17,6 +17,7 @@ used, clearly labelled with its date, when there is no connection.
 from __future__ import annotations
 
 import json
+import re
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -59,10 +60,24 @@ def _get_json(url: str, params: dict[str, str] | None = None) -> Any:
     return r.json()
 
 
+def _currency(code: str) -> str:
+    code = str(code).strip().upper()
+    if not re.fullmatch(r"[A-Z]{3}", code):
+        raise ValueError(f"'{code}' is not a three-letter currency code")
+    return code
+
+
+def _country(code: str) -> str:
+    code = str(code).strip().upper()
+    if not re.fullmatch(r"[A-Z]{2}", code):
+        raise ValueError(f"'{code}' is not a two-letter country code")
+    return code
+
+
 def exchange_rates(base: str, quotes: list[str], offline: bool = False) -> dict[str, Any]:
     """Units of each quote currency per one unit of ``base``."""
-    base = base.upper()
-    quotes = [q.upper() for q in quotes if q.upper() != base]
+    base = _currency(base)
+    quotes = [_currency(q) for q in quotes if _currency(q) != base]
     name = f"fx_{base}"
     rates: dict[str, float] = {}
     source, as_of, live = "", "", False
@@ -97,7 +112,8 @@ def exchange_rates(base: str, quotes: list[str], offline: bool = False) -> dict[
 def convert(
     amount: float, from_currency: str, to_currency: str, offline: bool = False
 ) -> dict[str, Any]:
-    if from_currency.upper() == to_currency.upper():
+    from_currency, to_currency = _currency(from_currency), _currency(to_currency)
+    if from_currency == to_currency:
         return {"amount": amount, "currency": to_currency.upper(), "rate": 1.0, "live": True}
     fx = exchange_rates(from_currency, [to_currency], offline=offline)
     rate = fx["rates"].get(to_currency.upper())
@@ -115,7 +131,7 @@ def convert(
 
 
 def public_holidays(country: str, year: int, offline: bool = False) -> dict[str, Any]:
-    country = country.upper()
+    country = _country(country)
     name = f"holidays_{country}_{year}"
     if not offline:
         try:
@@ -191,6 +207,8 @@ def schedule_send(
             "comparison stays fair; they only make the effect noisier."
             if inside
             else "No public holiday inside the measurement window."
+            if days
+            else "Holiday calendar unavailable: only weekends were avoided."
         ),
         "calendar_known": bool(days),
         "live": live,

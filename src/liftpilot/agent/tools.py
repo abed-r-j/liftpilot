@@ -151,7 +151,23 @@ class Toolbox:
         offer = self.offer.model_copy(
             update={k: v for k, v in {"offer_text": offer_text, "deadline": deadline}.items() if v}
         )
-        by_seg = sp.summary.get("contacted_by_rfm_segment", {"All customers": {"contacted": 1}})
+        if self.engine.approval_status(plan_id) == "approved":
+            raise ApprovalRequired(
+                "messages cannot be redrafted after the plan was approved: the approver has not "
+                "seen the new wording. Create a new plan and ask for approval again."
+            )
+        # the offer wording comes from the manager or the model: it must itself be clean
+        probe = check_copy(f"{offer.brand}: {offer.offer_text}. {offer.opt_out}.", offer)
+        if not probe.ok:
+            raise ValueError(
+                "the offer text was refused by the copy checks: "
+                + "; ".join(probe.problems)
+                + ". Numbers and deadlines must be on the approved offer sheet."
+            )
+        by_seg = sp.summary.get(
+            "contacted_by_rfm_segment",
+            {"All customers": {"contacted": sp.plan.n_selected}},
+        )
         results: dict[str, Any] = {}
         for segment, info in by_seg.items():
             if info["contacted"] == 0:
@@ -168,7 +184,10 @@ class Toolbox:
             if not verdict.ok:  # a template must always pass; last line of defence
                 text, origin = f"{offer.brand}: {offer.offer_text}. {offer.opt_out}.", "minimal"
                 verdict = check_copy(text, offer)
-            sp.messages[segment] = text
+            if verdict.ok:  # a message that fails the checks is never stored
+                sp.messages[segment] = text
+            else:
+                sp.messages.pop(segment, None)
             results[segment] = {
                 "customers": info["contacted"],
                 "message": text,

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -26,7 +27,12 @@ from pathlib import Path
 from typing import Any
 
 from liftpilot import config
-from liftpilot.agent.grounding import GroundingReport, check_grounding, numbers_in
+from liftpilot.agent.grounding import (
+    CURRENCY_WORDS,
+    GroundingReport,
+    check_grounding,
+    stated_amounts,
+)
 from liftpilot.agent.llm import LLMUnavailable, OllamaClient
 from liftpilot.agent.report import overclaims, verified_statements
 from liftpilot.agent.tools import Toolbox
@@ -151,16 +157,24 @@ class Agent:
 
     # ---------------------------------------------------------------- plumbing
     @staticmethod
-    def _provenance(args: dict[str, Any], said: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    def _provenance(
+        args: dict[str, Any], said: str, data_currency: str = ""
+    ) -> tuple[dict[str, Any], dict[str, Any], str | None]:
         """Keep only planning assumptions the manager actually stated.
 
         A language model asked to "use the usual costs" will happily supply a
         cost of its own. Money assumptions are therefore accepted only if the
-        same number appears in the manager's words (as written, or as a
-        percentage); anything else is dropped and the system default applies.
+        same number appears in the manager's words (as written, as a
+        percentage, or with a unit such as "1 million" or "50k"); anything
+        else is dropped and the system default applies.
+
+        A budget is a spending limit, so it is never guessed: if the amount or
+        its currency cannot be matched to the manager's words, no plan is made
+        and the third return value says what to clarify.
         """
-        stated = numbers_in(said)
+        stated = stated_amounts(said)
         text = said.lower()
+        mentioned = {iso for iso, words in CURRENCY_WORDS.items() if any(w in text for w in words)}
         kept: dict[str, Any] = {}
         dropped: dict[str, Any] = {}
         for key, value in args.items():
@@ -173,7 +187,7 @@ class Agent:
                 else:
                     ok = any(abs(v - s) < 1e-9 or abs(v * 100 - s) < 1e-6 for s in stated)
             elif key == "budget_currency":
-                ok = str(value).lower() in text
+                ok = str(value).upper() in mentioned
             elif key == "fair_mode":
                 ok = (
                     (str(value).lower() not in ("true", "1", "yes"))
@@ -181,17 +195,34 @@ class Agent:
                     or ("equal" in text)
                 )
             (kept if ok else dropped)[key] = value
+        problem = None
+        foreign = mentioned - {data_currency.upper()}
+        if "budget" in dropped:
+            problem = (
+                f"budget {dropped['budget']} does not match any amount in the manager's "
+                "request. Pass the budget exactly as stated, or ask the manager to restate it."
+            )
+        elif "budget" in kept and "budget_currency" not in kept and foreign:
+            problem = (
+                "the request states a budget in a foreign currency "
+                f"({', '.join(sorted(foreign))}); pass budget_currency with that ISO code."
+            )
+        elif "budget" not in kept and re.search(r"\bbudget of\b|\bbudget is\b|\bbudget:", text):
+            problem = "the manager stated a budget; pass it as `budget` (with budget_currency)."
         if "budget" not in kept:
             kept.pop("budget_currency", None)
-        return kept, dropped
+        return kept, dropped, problem
 
     def _execute(self, run: AgentRun, name: str, args: dict[str, Any]) -> Any:
         start = time.perf_counter()
         dropped: dict[str, Any] = {}
+        problem = None
         if name == "plan_campaign" and run.mode == "llm":
-            args, dropped = self._provenance(args, run.said or run.request)
-        result = self.toolbox.call(name, args)
-        if dropped and isinstance(result, dict):
+            args, dropped, problem = self._provenance(
+                args, run.said or run.request, self.toolbox.engine.currency
+            )
+        result = {"error": problem} if problem else self.toolbox.call(name, args)
+        if dropped and isinstance(result, dict) and not problem:
             result["ignored_arguments"] = {
                 "values": dropped,
                 "reason": "not stated by the manager; system defaults were used instead",
@@ -301,7 +332,22 @@ class Agent:
         started = time.perf_counter()
         self.audit.write(run.run_id, "request", text=request)
         if self.llm is None or not self.llm.available():
-            run.error = "local model not available; scripted planner used"
+            text = request.lower()
+            has_assumptions = bool(stated_amounts(request) - {float(i) for i in range(11)}) or any(
+                w in text for words in CURRENCY_WORDS.values() for w in words
+            )
+            if has_assumptions:
+                # without the model nothing can read assumptions out of free text, and
+                # planning on defaults while the request names other figures would mislead
+                run.mode = "scripted"
+                run.error = "local model not available"
+                run.answer = (
+                    "The local language model is not running, so the costs or budget written in "
+                    "this request cannot be read. No plan was made. Set the assumptions with the "
+                    "controls in the Optimizer tab and use the scripted planner, or start Ollama."
+                )
+                return self._finish(run, started)
+            run.error = "local model not available; scripted planner used with default costs"
             return self.run_scripted(request, run=run)
         run.said = " ".join(
             [str(m.get("content", "")) for m in (history or []) if m.get("role") == "user"]

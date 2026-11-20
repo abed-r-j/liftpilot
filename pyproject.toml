@@ -1,6 +1,6 @@
 [project]
 name = "liftpilot"
-version = "0.1.0"
+version = "1.0.0"
 description = "LiftPilot: an AI campaign agent that spends marketing budget only where it changes customer behaviour (RFM + uplift modeling + profit-optimal targeting)."
 readme = "README.md"
 requires-python = ">=3.11,<3.14"

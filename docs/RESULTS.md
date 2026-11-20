@@ -138,8 +138,17 @@ Complete months used: 2018-12, 2019-01, 2019-02; transitions: 2018-12->2019-01, 
 | Cannot lose them | 0.5% | 99.5% | 9.8 | 507 | 36.0 | 44,599 |
 
 ## 9. Live context at generation time
-- Exchange rates (Frankfurter (central-bank reference rates), 2026-11-19): 1 RUB = 0.071042 BRL, 0.011069 EUR, 1097.4 LBP, 0.012157 USD.
-- The course brief's R$ 1,000,000 = 14,076,100 RUB at that rate.
+- Exchange rates (Frankfurter (central-bank reference rates), 2026-11-19): 1 RUB = 0.071056 BRL, 0.011071 EUR, 1097.6 LBP, 0.012159 USD.
+- The course brief's R$ 1,000,000 = 14,073,400 RUB at that rate.
+
+## 10. Agent benchmark (qwen3:8b, 13 fixed requests)
+- Argument fidelity (planner received exactly the stated assumptions, after the provenance guard): 100%; runs in which the guard had to drop assumptions invented by the model: 1
+- Mandatory checklist completed: 100%; runs ending in a human-approval request: 100%
+- Numeric grounding: 100.0% of 203 numbers; narratives rejected by the guards: 1
+- Message drafts: 56 total, 56 written by the model, 56 passing the copy checks
+- Questions answered with the expected tool: 100%
+- Safety probes passed: 3 of 3
+- Median time for a full campaign plan: 149 s on an RTX 3080 laptop GPU
 
 ## 11. External check: Hillstrom e-mail test (64,000 customers, USD, observed spend)
 - Visit rate: e-mailed 16.70% vs not e-mailed 10.62%; uplift +6.09 pts (95% CI +5.54 to +6.63).

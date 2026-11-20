@@ -251,7 +251,7 @@ def test_scripted_agent_runs_full_workflow_and_waits_for_human(engine, tmp_path)
 
 def test_invented_arguments_are_dropped_by_the_provenance_guard():
     said = "Plan a campaign. A message costs 6 RUB, margin 25%, budget 1,000,000 BRL."
-    kept, dropped = Agent._provenance(
+    kept, dropped, _ = Agent._provenance(
         {
             "contact_cost": 6,
             "margin": 0.25,
@@ -264,11 +264,101 @@ def test_invented_arguments_are_dropped_by_the_provenance_guard():
     )
     assert kept == {"contact_cost": 6, "margin": 0.25, "budget": 1000000, "budget_currency": "BRL"}
     assert dropped == {"discount": 0.03, "fair_mode": True}
-    kept, dropped = Agent._provenance(
+    kept, dropped, _ = Agent._provenance(
         {"contact_cost": 15, "discount": 0.03, "margin": 0.25, "budget_currency": "USD"},
         "Plan our next campaign with the usual costs.",
     )
     assert kept == {} and set(dropped) == {"contact_cost", "discount", "margin", "budget_currency"}
+
+
+def test_budget_is_never_guessed():
+    prov = Agent._provenance
+    # amount written with a unit, currency written as a word
+    kept, _, problem = prov(
+        {"budget": 1000000, "budget_currency": "BRL", "contact_cost": 6},
+        "The CEO gives us 1 million reais as budget. A message costs 6 RUB.",
+        "RUB",
+    )
+    assert problem is None and kept["budget"] == 1000000 and kept["budget_currency"] == "BRL"
+    kept, _, problem = prov({"budget": 50000}, "Budget of 50 000 RUB, please.", "RUB")
+    assert problem is None and kept == {"budget": 50000}
+    # model drops the currency of a foreign-currency budget: refuse instead of reinterpreting
+    _, _, problem = prov({"budget": 1000000}, "We have a budget of 1,000,000 BRL.", "RUB")
+    assert problem and "budget_currency" in problem
+    # model changes the amount: refuse
+    _, dropped, problem = prov({"budget": 100000}, "We have a budget of 1,000,000 RUB.", "RUB")
+    assert "budget" in dropped and problem
+    # model forgets a stated budget: refuse
+    _, _, problem = prov({"contact_cost": 6}, "Budget of 100,000 RUB, 6 RUB per message.", "RUB")
+    assert problem
+
+
+def test_grounding_rejects_loose_round_numbers():
+    tools = [{"margin": 0.25, "profit": 1549000}]
+    assert not check_grounding("The margin is 30%.", tools).ok
+    assert not check_grounding("Profit about 2,000,000.", tools).ok
+    assert check_grounding("Profit about 1,550,000 at a 25% margin.", tools).ok
+
+
+def test_failed_or_late_drafts_cannot_reach_export(engine, tmp_path):
+    box = Toolbox(engine, llm=None, offline=True)
+    plan = engine.plan()
+    pid = plan["plan_id"]
+    bad = box.call("draft_messages", {"plan_id": pid, "offer_text": "50% off, last chance"})
+    assert "error" in bad and not engine.plans[pid].messages
+    ok = box.call("draft_messages", {"plan_id": pid})
+    assert all(m["passed_checks"] for m in ok["messages"].values())
+    engine.request_approval(pid)
+    engine.human_approve(pid, "Manager")
+    late = box.call("draft_messages", {"plan_id": pid, "offer_text": "something else"})
+    assert late["blocked_by"] == "human approval gate"
+
+
+def test_fair_mode_respects_the_budget_on_real_spend(engine):
+    p = engine.plan(discount=0.05, budget=3000.0, equal_value=True)
+    assert p["expected_spend"] <= 3000.0
+    assert p["customers_to_contact"] > 0
+
+
+def test_statement_does_not_call_a_loss_likely_profitable():
+    from types import SimpleNamespace
+
+    from liftpilot.agent.report import verified_statements
+
+    plan = {
+        "plan_id": "p",
+        "currency": "RUB",
+        "customers_to_contact": 10,
+        "customers_in_audience": 100,
+        "share_contacted": 0.1,
+        "customers_not_contacted": 90,
+        "expected_spend": 100,
+        "expected_incremental_profit": 50,
+        "assumptions": {
+            "gross_margin": 0.25,
+            "cost_per_message": 10.0,
+            "discount_share_of_basket": 0.0,
+            "budget": None,
+        },
+    }
+    ev = {
+        "plan_id": "p",
+        "profit_ci_95": [-150000, 140000],
+        "real_incremental_profit": -9000,
+        "probability_profit_positive": 0.45,
+        "contact_everyone_incremental_profit": -1000000,
+        "contact_everyone_spend": 2000000,
+        "profit_gain_vs_contact_everyone": 991000,
+        "spend_saved_vs_contact_everyone": 1900000,
+        "real_incremental_roas": 3.1,
+        "break_even_roas": 4.0,
+    }
+    steps = [
+        SimpleNamespace(tool="plan_campaign", result=plan),
+        SimpleNamespace(tool="evaluate_plan", result=ev),
+    ]
+    text = " ".join(verified_statements(steps, "p"))
+    assert "more likely than not" not in text and "cannot be expected to make money" in text
 
 
 def test_demographic_targeting_is_refused(engine):

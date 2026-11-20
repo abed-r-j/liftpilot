@@ -1,7 +1,7 @@
 """Static figures (PNG at 300 dpi and PDF) for the paper and the slides.
 
 Every figure is drawn from the saved evaluation report, so the pictures and
-the tables can never disagree. Run ``liftpilot figures``.
+the tables can never disagree. Run ``liftpilot results``.
 """
 
 from __future__ import annotations

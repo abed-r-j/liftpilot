@@ -169,7 +169,8 @@ def write_results_md(path: Path | None = None) -> Path:
         f"- Customers with purchase history: **{ds['customers_total']:,}**; in the randomised "
         f"experiment: **{ds['customers_in_experiment']:,}**; never tested (next audience): "
         f"**{ds['splits']['new']:,}**.",
-        f"- History window: {ds['history_start']} to {ds['reference_date']}; model features: "
+        f"- Purchase history from {ds['history_start']} up to, not including, the reference "
+        f"date {ds['reference_date']}; model features: "
         f"{ds['n_features']} (age and gender excluded). Invalid ages set to missing: "
         f"{ds['invalid_ages_set_missing']:,}.",
         f"- Split of labelled customers: train {ds['splits']['train']:,} / calibration "

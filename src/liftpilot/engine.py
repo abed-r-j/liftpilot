@@ -216,6 +216,35 @@ class CampaignEngine:
             return part["value"]
         return pd.Series(float(self.customers["value"].mean()), index=part.index)
 
+    def _select(
+        self,
+        econ: Economics,
+        part: pd.DataFrame,
+        budget: float | None,
+        eligible: np.ndarray,
+        min_gain: float,
+        equal_value: bool,
+    ) -> Plan:
+        """Allocate; in fair mode make sure the budget holds for REAL expected spend."""
+        plan = allocate(
+            econ,
+            self._value(part, equal_value),
+            part["uplift"],
+            part["p1"],
+            budget=budget,
+            eligible=eligible,
+            min_gain=min_gain,
+        )
+        if not equal_value or budget is None or not plan.selected.any():
+            return plan
+        real_spend = expected_spend(econ, part["value"], part["p1"])
+        chosen = np.flatnonzero(plan.selected)
+        order = chosen[np.argsort(-plan.gain[chosen], kind="stable")]
+        keep = order[np.cumsum(real_spend[order]) <= budget]
+        selected = np.zeros(len(part), dtype=bool)
+        selected[keep] = True
+        return Plan(selected, plan.gain, real_spend, budget, plan.eligible)
+
     def _eligible(
         self, part: pd.DataFrame, rules: dict[str, Any]
     ) -> tuple[np.ndarray, dict[str, int]]:
@@ -284,15 +313,7 @@ class CampaignEngine:
             "equal_value": equal_value,
         }
         eligible, removed = self._eligible(part, rules)
-        plan = allocate(
-            econ,
-            self._value(part, equal_value),
-            part["uplift"],
-            part["p1"],
-            budget=budget,
-            eligible=eligible,
-            min_gain=safety_margin,
-        )
+        plan = self._select(econ, part, budget, eligible, safety_margin, equal_value)
         plan_id = (
             "plan-"
             + hashlib.sha1(  # noqa: S324 - identifier, not security
@@ -394,14 +415,13 @@ class CampaignEngine:
         ratio_budget = None
         if sp.budget is not None:
             ratio_budget = sp.budget * len(test) / max(len(sp.index), 1)
-        plan = allocate(
+        plan = self._select(
             sp.economics,
-            self._value(test, bool(sp.rules.get("equal_value"))),
-            test["uplift"],
-            test["p1"],
-            budget=ratio_budget,
-            eligible=eligible,
-            min_gain=float(sp.rules.get("safety_margin", 0.0)),
+            test,
+            ratio_budget,
+            eligible,
+            float(sp.rules.get("safety_margin", 0.0)),
+            bool(sp.rules.get("equal_value")),
         )
         scale = len(sp.index) / len(test)
         t, y, rev = test["t"].to_numpy(), test["y"].to_numpy(), test["revenue"].to_numpy()
@@ -642,6 +662,8 @@ class CampaignEngine:
         out["group"] = np.where(holdout, "holdout_do_not_send", "send")
         if sp.messages and "rfm_segment" in out.columns:
             out["message"] = out["rfm_segment"].map(sp.messages).fillna("")
+        elif "All customers" in sp.messages:
+            out["message"] = sp.messages["All customers"]
         target = (out_dir or config.runs_dir()) / plan_id
         target.mkdir(parents=True, exist_ok=True)
         out.to_csv(target / "audience.csv", encoding="utf-8")

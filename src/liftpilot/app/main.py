@@ -241,9 +241,12 @@ with tabs[0]:
             "campaign results is why platform ROAS looks better than reality."
         )
     with right:
-        by_f = rep.get("uplift_by_rfm_score", {}).get("f_score") or rep.get(
-            "uplift_by_rfm_score", {}
-        ).get("m_score")
+        by_f = rep.get("uplift_by_rfm_score", {}).get("f_score")
+        if not by_f:
+            st.info(
+                "This data set has no purchase-frequency history, so the frequency view is "
+                "not available. See the X5 data set for the full RFM analysis."
+            )
         if by_f:
             st.markdown("#### The more they already buy, the less a message adds")
             keys = sorted(by_f)
@@ -552,10 +555,18 @@ with tabs[3]:
             "Budget currency", [cur, "BRL", "USD", "EUR"], label_visibility="collapsed"
         )
         bval = dd.number_input(f"Budget ({bcur})", min_value=0.0, value=100000.0, step=10000.0)
-        conv = live.convert(bval, bcur, cur, offline) if bcur != cur else {"amount": bval}
-        budget = float(conv.get("amount", bval))
-        if bcur != cur:
-            dd.caption(f"= {budget:,.0f} {cur} at today's rate")
+        if bcur == cur:
+            budget = float(bval)
+        else:
+            conv = live.convert(bval, bcur, cur, offline)
+            if "amount" in conv:
+                budget = float(conv["amount"])
+                dd.caption(
+                    f"= {budget:,.0f} {cur} ({'live' if conv.get('live') else 'cached'} rate, "
+                    f"{conv.get('as_of', '')})"
+                )
+            else:
+                dd.error(f"No {bcur}→{cur} rate available; the budget limit is NOT applied.")
 
     fair_mode = st.toggle(
         "Fair mode: value every customer at the average basket (small spenders are not "
@@ -601,8 +612,14 @@ with tabs[3]:
         delta_color="off",
     )
     st.markdown(
-        f"<p class='note'>Audience: {plan['customers_in_audience']:,} customers who were never "
-        f'in the experiment. "Real" figures replay this exact rule on {ev["test_customers"]:,} '
+        f"<p class='note'>Audience: {plan['customers_in_audience']:,} customers "
+        + (
+            "who were never in the experiment"
+            if profile["customers_never_tested"]
+            else "(this data set has no untested customers, so the audience is the experiment "
+            "itself and the expected figures are in-sample)"
+        )
+        + f'. "Real" figures replay this exact rule on {ev["test_customers"]:,} '
         f"held-out randomised customers and scale to the audience. 95% interval for profit: "
         f"<b>{ev['profit_ci_95'][0]:,.0f} to {ev['profit_ci_95'][1]:,.0f} {cur}</b>; probability "
         f"profit is positive: <b>{ev['probability_profit_positive']:.0%}</b>. "
@@ -683,8 +700,9 @@ with tabs[3]:
     )
 
     with st.expander("Why is this one customer contacted, or not?"):
-        sample = eng.customers.index[eng.customers["split"] == "new"][:200].tolist()
-        cid = st.selectbox("Customer id", sample) if sample else st.text_input("Customer id")
+        pool = "new" if profile["customers_never_tested"] else "test"
+        sample = eng.customers.index[eng.customers["split"] == pool][:200].tolist()
+        cid = st.selectbox("Customer id", sample)
         if cid:
             info = eng.explain_customer(cid, plan["plan_id"])
             cc = st.columns(4)
