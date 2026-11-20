@@ -20,7 +20,7 @@ Start with the row that matches what you need.
 | `README.md` | this index | hand |
 | `BRIEF.md` | authoring brief: the story in the order the evidence supports it, and the rules for every document | hand |
 | `RESULTS.md` | the results sheet: every headline number in one place | `liftpilot results` |
-| `EXPLAINER.md` | plain-language explanation of the business problem, the method, each table, the agent, the ethics and the course metrics; glossary; file map; ten things to remember | hand, numbers from `RESULTS.md` |
+| `EXPLAINER.md` | plain-language explanation of the business problem, the method, each table, the agent and its controls (provenance guard, verified statements), the ethics and the course metrics; glossary; file map; ten things to remember | hand, numbers from `RESULTS.md` |
 | `MODEL_CARD.md` | model card for the uplift model and for the agent's language model | hand, numbers from `RESULTS.md` |
 | `DATASHEET.md` | datasheet for X5 RetailHero and Hillstrom as used here, with unknowns listed as unknown | hand |
 | `ETHICS.md` | "Is it wise?": position, sources, measured fairness findings, control-by-control mapping, misuse, open questions | hand, numbers from `RESULTS.md` |
@@ -40,7 +40,7 @@ tables.
 | `figures/fig_calibration` | measured uplift per score bin and the fitted calibration line |
 | `figures/fig_scenarios` | real incremental profit by rule in the three X5 scenarios |
 | `figures/fig_scenarios_hillstrom` | the same comparison on the Hillstrom e-mail test |
-| `figures/fig_fairness_age` | selection rate by age band as contact cost rises |
+| `figures/fig_fairness_age` | selection rate by age band, relative to the average, as contact cost rises (regenerated with the corrected audit). The last point on the right, "under 18", sits at zero because minors are never contacted by rule; it is not part of the ratio and is not a drop after the 65+ band |
 | `figures/fig_gantt` | a twelve-week pilot roadmap |
 
 ## Keeping the documents honest
@@ -50,3 +50,7 @@ tables.
 2. Compare the new `RESULTS.md` with the old one.
 3. Update every hand-written document that quotes a number that changed. Each profit figure
    keeps its 95% interval.
+
+The hand-written documents in this folder were last checked against `RESULTS.md` on 2026-11-20
+(release 1.0.0). The sections that change most often are 7 (fairness), 9 (exchange rate, fetched
+live on every run) and 10 (agent benchmark).

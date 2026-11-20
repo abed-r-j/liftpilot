@@ -133,6 +133,51 @@ REP = json.loads((ART / "x5" / "report.json").read_text(encoding="utf-8"))
 EXT = json.loads((ART / "extra_analyses.json").read_text(encoding="utf-8"))
 CUR = json.loads((ART / "x5" / "curves.json").read_text(encoding="utf-8"))
 
+# Fairness audit (docs/RESULTS.md, section 7), read from the same file the results sheet is
+# written from, so the slide, the notes and the script cannot drift apart.
+FAIR = {r["cost"]: r for r in EXT["fairness_by_cost"]}
+FAIR_MODE = {(r["cost"], bool(r["fair_mode"])): r for r in EXT["fair_mode"]}
+AUDIT_SKIP = ("unknown", "under 18")  # minors are excluded by rule and kept out of the audit
+# What the audit reported before a code review found that it counted excluded minors inside
+# the 18-24 band (2 / 6 / 10 RUB). Kept only to tell that story; see docs/BRIEF.md, point 9.
+OLD_AUDIT = "0.85\u00a0/\u00a00.70\u00a0/\u00a00.48"
+
+
+def ratio(cost: float) -> str:
+    return f"{FAIR[cost]['ratio']:.2f}"
+
+
+def pts(x: float) -> str:
+    return f"{x * 100:+.1f}"
+
+
+def age_story() -> dict[str, str]:
+    """The fairness figures used on the ethics slide and in its script."""
+    flagged = [c for c in sorted(FAIR) if FAIR[c]["flag"]]
+    off, on = FAIR_MODE[(6.0, False)], FAIR_MODE[(6.0, True)]
+    up = FAIR[6.0]["measured_uplift_by_age"]
+    low10 = FAIR[10.0]["lowest"]
+    # the script below is written for this shape of result; fail loudly if the data moves
+    assert flagged == [10.0], flagged
+    assert on["age_ratio"] < off["age_ratio"], (on, off)
+    assert on["real_profit"] < 0.6 * off["real_profit"], (on, off)
+    assert low10 == "18-24", low10
+    assert up[low10] == min(v for k, v in up.items() if k not in AUDIT_SKIP), up
+    return {
+        "low10": low10,
+        "up_low": pts(up[low10]),
+        "up_old": pts(up["65+"]),
+        "fair_off": f"{off['age_ratio']:.2f}",
+        "fair_on": f"{on['age_ratio']:.2f}",
+        "profit_off": f"{off['real_profit']:,.0f}",
+        "profit_on": f"{on['real_profit']:,.0f}",
+        "ci_off": f"{off['ci'][0]:,.0f} to {off['ci'][1]:,.0f}",
+        "ci_on": f"{on['ci'][0]:,.0f} to {on['ci'][1]:,.0f}",
+    }
+
+
+AGE = age_story()
+
 
 # ------------------------------------------------------------------ script
 def bench_sentence() -> str:
@@ -162,7 +207,7 @@ def bench_sentence() -> str:
     return (
         f"We benchmarked the agent on {b['cases']} fixed requests. After our guard, the planner "
         f"received exactly the stated assumptions {fid}. {chk} {grd}, and it passed "
-        f"{b['probes']} safety traps. A full plan takes about {b['median']} seconds, which is "
+        f"{b['probes']} safety traps. The median full plan took {b['median']} seconds, which is "
         "why I started it early."
     )
 
@@ -249,8 +294,8 @@ SCRIPT: list[tuple[str, int, str]] = [
         "purchases a ranking finds compared with random targeting. The likely-buyer model, in "
         "red, is no better than random. Uplift models learn from both groups of the "
         "experiment, so they learn the difference a message makes. Their Qini is small but "
-        "significantly above zero, and their top 10 percent reacts by 9.9 points, three times "
-        "the average.",
+        "significantly above zero, and the chosen model's top 10 percent reacts by 9.9 "
+        "points, three times the average.",
     ),
     (
         "calc",
@@ -289,11 +334,12 @@ SCRIPT: list[tuple[str, int, str]] = [
         "agent",
         45,
         "The second AI part is the agent. In the course taxonomy it is utility-based: it "
-        "looks for the plan with the highest expected profit. Its brain is an "
-        "8-billion-parameter language model on this laptop, with no cloud and no fee. It can "
-        "act only through 16 tools: 12 read, 3 propose, 1 acts. In testing the model invented "
-        "arguments, skipped steps and mistyped numbers. Each failure became a control, on the "
-        "right. And the export tool refuses to run until a named human approves.",
+        "seeks the plan with the highest expected profit. Its brain is an "
+        "8-billion-parameter language model on this laptop: no cloud, no fee. It acts only "
+        "through 16 tools: 12 read, 3 propose, 1 acts. In testing the model invented "
+        "arguments, skipped steps and mistyped numbers. Each failure became a control. For "
+        "example, a provenance guard drops any assumption the manager did not state, and "
+        "never guesses a budget. And nothing is exported until a named human approves.",
     ),
     (
         "where",
@@ -311,13 +357,13 @@ SCRIPT: list[tuple[str, int, str]] = [
     (
         "ethics",
         55,
-        "Is it wise? Age and gender are never model inputs, yet we audited who gets selected. "
-        "As contact gets more expensive, 18 to 24 year-olds are selected less: the ratio "
-        "falls from 0.85 to 0.70, then 0.48, and the system flags it for human review. The "
-        "gap follows a real difference: the message moves the youngest by 1.4 points and the "
-        "over-65s by 5.9. We tried a fair mode. It did not close the gap and roughly halved "
-        "profit, so we report a negative result. The legal texts behind the controls are on "
-        "the slide.",
+        "Is it wise? Age and gender are never model inputs, and minors are never contacted. "
+        "We still audit who gets selected. Among adults the age gap is small: the ratio of "
+        f"lowest to highest selection rate is {ratio(2.0)} at 2 roubles and {ratio(6.0)} at 6. "
+        f"Only at 10 roubles does it fall to {ratio(10.0)}, and the plan is flagged for human "
+        "review. We tried a fair mode. It made the gap worse and roughly halved profit: a "
+        "negative result. One honest note: our first audit counted excluded minors as young "
+        "adults and overstated the gap. A code review caught it. Even the audit needs review.",
     ),
     (
         "business",
@@ -385,11 +431,12 @@ DEMO_STEPS: list[tuple[str, int, str, str, str]] = [
         25,
         "Tab 4, Optimizer",
         "Click the tab. The cost slider was set to 6.0 before the talk: do not move it. Point at "
-        "the Contact tile, the bar chart, then the yellow warning.",
+        "the Contact tile, then the bar chart. There is no yellow fairness warning at 6 RUB; "
+        "point at the empty space under the Fair mode switch.",
         "The optimizer, set to 6 roubles a message. The plan contacts about 19 percent of the "
         "audience. At 2 roubles it was about 70 percent. The bar chart shows that contacting "
-        "everyone would lose money. And the yellow box: the fairness audit flagged the age gap "
-        "by itself.",
+        "everyone would lose money. And no fairness warning here: at 6 roubles the audit "
+        "passes.",
     ),
     (
         "1:05",
@@ -435,9 +482,10 @@ DEMO_STEPS: list[tuple[str, int, str, str, str]] = [
         "2:10",
         20,
         "Tab 6, Ethics & audit",
-        "Click the tab, point at the age chart (right), scroll to the audit log.",
-        "Last tab. The age chart for the 6-rouble plan with its review flag, the list of "
-        "controls, and the audit log. My approval was just recorded, with my name.",
+        "Click the tab, point at the age chart (right) and the green OK pill under it, scroll "
+        "to the audit log.",
+        "Last tab. The age audit of the 6-rouble plan, marked OK, then the list of controls, "
+        "and the audit log. My approval was just recorded, with my name.",
     ),
 ]
 DEMO_RESERVE = DEMO_SECONDS - sum(s for _, s, _, _, _ in DEMO_STEPS)
@@ -483,7 +531,7 @@ TITLES = {
     "agent": "The agent is a local language model fenced by 16 tools, coded checks and a human gate.",
     "where": "Machine learning scores, rules decide, the language model explains, a human approves.",
     "demo": "Live demo: one request, a full campaign plan, and nothing leaves without my approval.",
-    "ethics": "Is it wise? We measured an age gap, tried to fix it, and report that the fix failed.",
+    "ethics": "Is it wise? Among adults the age gap is small and flagged only at 10 RUB; our fix made it worse.",
     "business": "A real business can pilot this in 12 weeks, if contact costs money and it can run one random test.",
     "close": "Do not pay for purchases you were going to get anyway.",
     "learners": "Backup: all six uplift models have a positive Qini on held-out customers; the likely-buyer model does not.",
@@ -828,10 +876,9 @@ def draw_scenarios(fig) -> None:
 
 def draw_fairness(fig) -> None:
     ax = fig.add_subplot()
-    rows = {r["cost"]: r for r in EXT["fairness_by_cost"]}
-    bands = [b for b in next(iter(rows.values()))["rates"] if b != "unknown"]
-    for cost, col in ((2.0, BLUE), (6.0, RED), (10.0, AMBER)):
-        r = rows[cost]
+    bands = [b for b in FAIR[2.0]["rates"] if b not in AUDIT_SKIP]
+    for cost, col in ((2.0, BLUE), (6.0, TEAL), (10.0, RED)):
+        r = FAIR[cost]
         ax.plot(
             bands,
             [r["rates"][b] / r["share"] for b in bands],
@@ -845,9 +892,9 @@ def draw_fairness(fig) -> None:
     ax.yaxis.set_major_locator(MaxNLocator(5))
     ax.set_ylabel("selection rate / average")
     ax.set_xlabel("age band (never a model input)")
-    ax.set_title("Who is contacted, by age")
+    ax.set_title("Who is contacted, adults by age")
     ax.legend(
-        frameon=False, loc="upper left", handlelength=1.0, labelspacing=0.2, borderaxespad=0.1
+        frameon=False, loc="lower center", handlelength=1.0, labelspacing=0.2, borderaxespad=0.3
     )
 
 
@@ -1796,19 +1843,25 @@ def s_agent(d: Deck) -> None:
     rx = LEFT + lw + 0.35
     rw = W - LEFT - rx
     rows = [
-        ["Seen in testing", "Control built in"],
-        ["Invented arguments", "Strict argument rule + validation"],
+        ["Seen in testing or review", "Control built in"],
+        [
+            "Invented arguments",
+            "Provenance guard: values not traceable to the manager's words are dropped",
+        ],
+        ["A guessed budget", "A budget or its currency is never guessed: the plan is refused"],
         ["Skipped steps", "Runtime checklist forces evidence, fairness audit, approval request"],
         [
             "Misdescribed figures",
             "Facts written by code as verified statements; the model only narrates",
         ],
-        ["Mistyped numbers", "Numeric grounding check"],
-        ["Over-confident wording", "Over-claim check; a failing narrative is discarded"],
-        ["Risky message copy", "Copy checked by code: length, opt-out, no pressure tactics"],
+        [
+            "Wrong numbers or wording",
+            "Grounding and over-claim checks; a failing narrative is discarded",
+        ],
+        ["Risky message copy", "Copy checked by code; a failing message is never stored"],
     ]
     rows = [[(r[0], {"bold": True}), r[1]] if i else r for i, r in enumerate(rows)]
-    table(s, rx, TOP, [2.4, rw - 2.4], rows, size=14, row_h=0.56)
+    table(s, rx, TOP, [2.7, rw - 2.7], rows, size=14, row_h=0.56)
     yb = TOP + 0.56 * 7 + 0.2
     card(s, rx, yb, rw, 0.9, accent=RED, fill=RED_SOFT)
     text(
@@ -1909,7 +1962,7 @@ def s_demo(d: Deck) -> None:
         (BLUE, "1", "Problem", "The experiment: 63.65% vs 60.33%"),
         (BLUE, "2", "Customers (RFM)", "Which segments really react"),
         (TEAL_D, "3", "Uplift models", "Likely-buyer model against uplift model"),
-        (TEAL_D, "4", "Optimizer", "The plan at 6 RUB, and its fairness flag"),
+        (TEAL_D, "4", "Optimizer", "The plan at 6 RUB, and its fairness check"),
         (VIOLET, "5", "AI agent", "Tool calls, verified statements, my approval"),
         (AMBER_D, "6", "Ethics & audit", "Fairness chart, guardrails, audit log"),
     ]
@@ -1962,67 +2015,129 @@ def s_demo(d: Deck) -> None:
 
 def s_ethics(d: Deck) -> None:
     s = d.slide("ethics")
-    w, fh = 4.75, 4.02
+    w, fh = 4.5, 3.8
     chart(s, "fairness", LEFT, TOP, w, fh, draw_fairness)
     rx = LEFT + w + 0.22
     rw = W - LEFT - rx
-    hw = (rw - 0.2) / 2
-    card(s, rx, TOP, hw, 2.3, accent=VIOLET)
+    # --- what the audit measured: one ratio per contact cost
+    h1 = 1.8
+    card(s, rx, TOP, rw, h1, accent=VIOLET)
     text(
         s,
         rx + 0.25,
-        TOP + 0.06,
-        hw - 0.33,
-        2.2,
+        TOP + 0.05,
+        rw - 0.35,
+        0.36,
         [
-            [("Measured", {"bold": True, "color": VIOLET, "size": 17})],
-            "Age and gender are never inputs. Still, 18-24s are selected less as cost rises: "
-            "ratio 0.85 at 2 RUB, 0.70 at 6, 0.48 at 10.",
-            [("Real effect: +1.4 pts (18-24) vs +5.9 (65+).", {"color": MUTED})],
+            [
+                ("Measured among adults", {"bold": True, "color": VIOLET, "size": 17}),
+                ("    lowest / highest selection rate", {"color": MUTED, "size": 14}),
+            ]
         ],
-        size=15,
-        after=4,
+        size=14,
+        after=0,
     )
-    card(s, rx + hw + 0.2, TOP, hw, 2.3, accent=RED)
+    nw = 0.98
+    for i, cost in enumerate((2.0, 4.0, 6.0, 10.0)):
+        x = rx + 0.25 + i * nw
+        flag = FAIR[cost]["flag"]
+        text(
+            s, x, TOP + 0.4, nw, 0.52, ratio(cost), size=26, bold=True, color=RED if flag else INK
+        )
+        text(
+            s,
+            x,
+            TOP + 0.9,
+            nw,
+            0.3,
+            f"{cost:g} RUB",
+            size=14,
+            bold=flag,
+            color=RED if flag else MUTED,
+        )
+    ex = rx + 0.25 + 4 * nw + 0.05
     text(
         s,
-        rx + hw + 0.45,
-        TOP + 0.06,
-        hw - 0.33,
-        2.2,
-        [
-            [("Negative result", {"bold": True, "color": RED, "size": 17})],
-            "Fair mode at 6 RUB: ratio 0.65 (was 0.70), profit 43,565 RUB (was 99,838).",
-            [("95% CI -25,589 to 120,655 (was -99,289 to 296,175).", {"color": MUTED})],
-        ],
-        size=15,
-        after=4,
+        ex,
+        TOP + 0.44,
+        rx + rw - ex - 0.12,
+        0.8,
+        "Under 0.80: flagged for human review. Minors are excluded by rule and kept out of "
+        "the audit.",
+        size=14,
+        after=0,
+        spacing=1.0,
     )
-    y2 = TOP + 2.46
-    card(s, rx, y2, rw, fh - 2.46, accent=TEAL)
+    text(
+        s,
+        rx + 0.25,
+        TOP + 1.2,
+        rw - 0.35,
+        0.56,
+        f"At 10 RUB the group selected least is {AGE['low10']}, the one the message moves "
+        f"least: {AGE['up_low']} pts measured, against {AGE['up_old']} for 65+.",
+        size=14,
+        color=MUTED,
+        spacing=1.0,
+        after=0,
+    )
+    # --- the fix that failed, and the error a review caught
+    y2 = TOP + h1 + 0.14
+    h2 = fh - h1 - 0.14
+    hw = (rw - 0.2) / 2
+    card(s, rx, y2, hw, h2, accent=RED)
     text(
         s,
         rx + 0.25,
         y2 + 0.04,
-        rw - 0.35,
-        fh - 2.5,
+        hw - 0.33,
+        h2 - 0.06,
         [
-            [("Controls", {"bold": True, "color": TEAL_D, "size": 17})],
-            "Ratio under 0.80 is flagged for human review. Opt-outs and minors are never contacted. "
-            "Copy has no pressure tactics. A human approves; a hold-out measures.",
+            [("Negative result", {"bold": True, "color": RED, "size": 17})],
+            f"Fair mode at 6 RUB made the gap worse: ratio {AGE['fair_on']} (was "
+            f"{AGE['fair_off']}), profit {AGE['profit_on']} RUB (was {AGE['profit_off']}).",
+            [(f"95% CI {AGE['ci_on']} (was {AGE['ci_off']}).", {"color": MUTED, "size": 14})],
         ],
         size=15,
         after=3,
+        spacing=1.0,
+    )
+    card(s, rx + hw + 0.2, y2, hw, h2, accent=AMBER, fill=AMBER_SOFT)
+    text(
+        s,
+        rx + hw + 0.45,
+        y2 + 0.04,
+        hw - 0.33,
+        h2 - 0.06,
+        [
+            [("Caught by a code review", {"bold": True, "color": AMBER_D, "size": 17})],
+            "Our first audit counted excluded minors inside the 18-24 band and overstated the "
+            f"gap ({OLD_AUDIT}).",
+            [("The audit itself needs review.", {"bold": True})],
+        ],
+        size=15,
+        after=3,
+        spacing=1.0,
     )
     y = TOP + fh + 0.12
-    card(s, LEFT, y, CW, 1.0, fill=SOFT)
+    hb = 6.93 - y
+    card(s, LEFT, y, CW, hb, fill=SOFT)
     text(
         s,
         LEFT + 0.25,
         y,
         CW - 0.4,
-        1.0,
+        hb,
         [
+            [
+                ("Controls.  ", {"bold": True, "color": TEAL_D}),
+                (
+                    "Age and gender are never model inputs. Ratio under 0.80: human review. "
+                    "Opt-outs and minors are never contacted. No pressure tactics in copy. A human "
+                    "approves; a hold-out measures.",
+                    {},
+                ),
+            ],
             [
                 ("Legal texts read in the original.  ", {"bold": True}),
                 (
@@ -2032,10 +2147,12 @@ def s_ethics(d: Deck) -> None:
                     "Our reading, not legal advice.",
                     {},
                 ),
-            ]
+            ],
         ],
         size=14,
         anchor=MSO_ANCHOR.MIDDLE,
+        after=3,
+        spacing=1.0,
     )
 
 
@@ -2459,8 +2576,8 @@ def demo_script() -> list[str]:
         "",
         "**Transition out of the demo** (Alt+Tab back to PowerPoint, slide 15):",
         "",
-        '> "So the system works, and it flagged its own fairness problem. Let us look at that '
-        'problem properly."',
+        '> "So the system works, and it audits its own fairness. Let us look at that audit '
+        'properly."',
         "",
     ]
     return L
@@ -2579,9 +2696,13 @@ def write_script(path: Path) -> None:
                 "",
                 f"> {KICKOFF_SAY}",
                 "",
-                "Why now: in the benchmark a full campaign plan took "
-                + (f"{BENCH['median']} seconds (median)" if BENCH else "two to three minutes")
-                + " on this laptop. Slides 12 to 14 and the first four demo tabs cover that wait.",
+                "Why now: a full campaign plan takes about 50 seconds on a cool laptop and two "
+                "minutes or more when the GPU is hot or shared"
+                + (f" (benchmark median {BENCH['median']} seconds)" if BENCH else "")
+                + ". Slides 12 to 14 and the first four demo tabs cover that wait. If the "
+                "language model is down, do not click Run agent with this request: it names a "
+                "cost and a budget, so the agent refuses to plan. Use Run scripted planner (see "
+                "`DEMO_RUNBOOK.md`, fallback B).",
                 "",
             ]
         if key == "demo":

@@ -234,7 +234,8 @@ def fig_calibration(rep: dict[str, Any], out: Path) -> None:
 def fig_fairness(rows: list[dict[str, Any]], out: Path) -> None:
     """``rows``: one dict per message cost with selection rates by age band."""
     fig, ax = plt.subplots(figsize=(3.5, 2.8))
-    bands = [b for b in rows[0]["rates"] if b != "unknown"]
+    # minors are excluded from contact by rule and from the audit: not plotted
+    bands = [b for b in rows[0]["rates"] if b not in ("unknown", "under 18")]
     palette = [BLUE, VIOLET, RED, AMBER]
     for r, color in zip(rows, palette, strict=False):
         overall = r["share"]

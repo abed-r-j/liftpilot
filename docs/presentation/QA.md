@@ -1,4 +1,4 @@
-# LiftPilot: 25 likely questions, with answers
+# LiftPilot: 26 likely questions, with answers
 
 Every figure below is in `docs/RESULTS.md`. "Points" means percentage points. Money is in the
 dataset's currency, presumed to be roubles (RUB). Costs of 2 or 6 RUB, the 3% discount and the
@@ -108,7 +108,7 @@ is the horizon: we have three complete months and two transitions, and lifetime 
 months, so these are orders of magnitude.
 
 **16. What is the answer to the R$ 1 million question?**
-At the reference rate of 19 November 2026, R$ 1,000,000 is 14,073,400 RUB (the figure on the
+At the reference rate of 19 November 2026, R$ 1,000,000 is 14,069,900 RUB (the figure on the
 results sheet; the app converts at the rate of the day). At 6 RUB per message, the plan for the
 never-tested audience contacts 19% of 200,123 customers, which costs about 230 thousand RUB.
 Its expected profit is 99,838 RUB, with a 95% interval from -114,276 to 299,621. So the first
@@ -132,11 +132,18 @@ does not estimate uplift, decide who is contacted, compute profit, or approve an
 done by machine learning, by rules, by statistics and by a human.
 
 **19. What happens when the model hallucinates?**
-We saw it in testing, and each failure became a control. Invented arguments are blocked by a
-strict argument rule and validation. Skipped steps are forced by a runtime checklist. Wrong
-numbers are caught by the numeric grounding check, and over-confident wording by an over-claim
-check. If the narrative still fails, it is discarded and the verified statements written by code
-are shown instead.
+We saw it in testing, and each failure became a control. Invented arguments are handled by a
+provenance guard: a cost, margin or discount reaches the planner only if the same number is in
+the manager's own words. Anything else is dropped, the default is used, and the tool result
+says which values were ignored. A budget is a spending limit, so it is never guessed: if the
+amount or its currency cannot be matched to the request, no plan is made and the agent is told
+what to clarify. Skipped steps are forced by a runtime checklist. Wrong numbers are caught by
+the numeric grounding check, and over-confident wording by an over-claim check. If the
+narrative still fails, it is discarded and the verified statements written by code are shown
+instead. In the benchmark the guard dropped invented assumptions in 1 run, and 1 narrative was
+rejected. The same logic applies to message copy: a draft that fails the copy checks is never
+stored, and messages cannot be redrafted after approval, because the approver would not have
+seen the new wording.
 
 **20. Why is it a "utility-based" agent, and what are the privilege levels?**
 In the course taxonomy a utility-based agent chooses the action with the best expected outcome;
@@ -152,30 +159,50 @@ each run we record whether the planner received exactly the stated assumptions, 
 mandatory checklist was completed, the share of numbers grounded in a tool result, and whether
 the probe was refused. The results, from section 10 of `docs/RESULTS.md`: argument fidelity 100%
 after the provenance guard, which had to drop invented assumptions in 1 run; checklist completed
-in 100% of runs; 100% of 203 numbers grounded; 1 narrative rejected by the guards and replaced
+in 100% of runs; 100% of 204 numbers grounded; 1 narrative rejected by the guards and replaced
 by the verified statements; 56 of 56 message drafts passed the copy checks; 3 of 3 safety probes
-passed. The median time for a full plan was 149 seconds on the laptop GPU. This is 13 requests
-on one model, so it is a regression check, not a proof. If the benchmark is run again, read the
-new numbers from the results sheet and rebuild the deck.
+passed. The median time for a full plan was 136 seconds on the laptop GPU; the same plan takes
+about 50 seconds when the laptop is cool. This is 13 requests on one model, so it is a
+regression check, not a proof. If the benchmark is run again, read the new numbers from the
+results sheet and rebuild the deck.
 
 ## E. Ethics
 
-**22. You do not use age, yet young customers are selected less. Is that discrimination?**
+**22. You do not use age, yet selection differs by age. Is that discrimination?**
 Age and gender are never model inputs, but removing an attribute does not remove its correlation
-with behaviour. Our audit found that the selection ratio for 18-24 year-olds falls from 0.85 at
-2 RUB to 0.70 at 6 RUB and 0.48 at 10 RUB. It follows a real difference in measured effect: +1.4
-points for 18-24 against +5.9 for 65 and over. The system does not decide whether that is
-acceptable; it flags any ratio under 0.80 for human review.
+with behaviour, so we audit every plan. Minors are never contacted, by rule, and are kept out of
+the audit. Among adults the gap is small. The ratio of the lowest to the highest selection rate
+is 0.96 at 2 RUB, 0.86 at 4 RUB and 0.82 at 6 RUB; none of these is flagged, and at those costs
+the group selected least is 65 and over. At 10 RUB, where only 4.6% of the audience is
+contacted, the ratio falls to 0.57, 18-24 year-olds are selected least, and the plan is flagged.
+For that group the gap is backed by the experiment: the message moves 18-24 year-olds least of
+all age bands, +1.1 points, against +5.9 for 65 and over. We do not have the same explanation
+for the over-65s, who react most and are still selected less than average; the audit alone
+cannot say why, which is one more reason the decision goes to a person. The system does
+not decide whether a gap is acceptable; it flags any ratio under 0.80 for human review. The
+gender ratio stays between 0.90 and 0.99.
 
 **23. Why did the fair mode fail, and why do you report it?**
 Fair mode values every customer at the average basket, so small spenders are not passed over for
-spending less. At 6 RUB the age ratio went from 0.70 to 0.65, so it did not close the gap, and
-profit fell from 99,838 RUB (95% interval -99,289 to 296,175) to 43,565 RUB (-25,589 to
-120,655). The gap comes from the difference in measured effect,
-not from basket size. We report it because a negative result is information: this fix does not
-work, and a business should not believe it does.
+spending less. At 6 RUB it made the age gap worse, not better: the ratio went from 0.82 to 0.58,
+which is under the 0.80 line, so the "fair" plan is the one that gets flagged. Profit fell from
+99,838 RUB (95% interval -99,289 to 296,175) to 43,565 RUB (-25,589 to 120,655), and the plan
+contacts 12.0% of the audience instead of 19.0%. At 2 RUB it changed little: the ratio went from
+0.96 to 0.93 and profit from 363,138 to 341,133 RUB. So basket size is not what drives the gap.
+We report it because a negative result is information: this fix does not work, and a business
+should not believe it does.
 
-**24. Is this legal, and is it manipulation?**
+**24. An earlier version of your audit showed a much larger age gap. What happened?**
+We got it wrong, and a code review caught it. The first version of the audit counted customers
+under 18 inside the 18-24 band. Minors are excluded from contact by rule, so their selection
+rate is zero, and that pulled the band down: the audit reported 0.85 at 2 RUB, 0.70 at 6 RUB and
+0.48 at 10 RUB. After the fix, minors have their own band, "under 18", which is left out of the
+ratio because its zero is a policy and not a model decision, and every number was regenerated:
+0.96, 0.82 and 0.57. The conclusion became less dramatic and more accurate: a small gap among
+adults, one flag at 10 RUB. We tell this on purpose. The audit is code too, and it needs review
+just as the model does.
+
+**25. Is this legal, and is it manipulation?**
 We designed against the texts we could read in the original. GDPR Article 21(2) and (3) give an
 unconditional right to object to direct marketing and the related profiling, so opt-outs are
 never contacted. GDPR Article 22 and Brazil's LGPD Article 20 concern decisions taken solely by
@@ -186,7 +213,7 @@ rejects pressure tactics. This is our reading as engineers, not legal advice.
 
 ## F. Business, data and limits
 
-**25. What if a company has never run a randomised campaign? And when does this not help at all?**
+**26. What if a company has never run a randomised campaign? And when does this not help at all?**
 Then uplift cannot be learned or checked, and we would not deploy. The 12-week pilot starts
 there: between week 2 and week 5 it designs and runs one baseline campaign with a random
 hold-out, which only requires leaving a random group of customers uncontacted. It does not help
@@ -206,11 +233,23 @@ when everyone reacts the same: on the Hillstrom e-mail test the right answer was
 - **Is "FreshMart" a real brand?** No. It is a fictional name used in the sample messages.
 - **Does live data change who is contacted?** No. Exchange rates only convert a budget stated in
   another currency, and the holiday calendar only sets the send date. Both are cached offline.
-- **Why does the agent take more than two minutes?** It is an 8-billion-parameter model on a
-  laptop GPU, and one plan needs seven tool calls, and the model also writes one message draft
-  per segment. The median was 149
-  seconds in the benchmark. A campaign decision does not need a faster answer, and in exchange
-  no customer data leaves the machine.
+- **Why does the agent take a minute or two?** It is an 8-billion-parameter model on a laptop
+  GPU, one plan needs seven tool calls, and the model also writes one message draft per
+  segment. A plan takes about 50 seconds on a cool laptop and two minutes or more when the GPU
+  is hot or shared; the median was 136 seconds in the benchmark. A campaign decision does not
+  need a faster answer, and in exchange no customer data leaves the machine.
+- **What if the language model is not running?** A scripted planner runs the same tools in a
+  fixed order and gives the same verified statements in a few seconds. It takes its costs from
+  the Optimizer controls. If a typed request contains costs or a budget, the agent refuses to
+  plan without the model, because nothing could read those figures and planning on defaults
+  would mislead.
+- **Can I ask the agent to target women over 60?** No. A campaign can only be restricted to RFM
+  segments; an unknown segment or a demographic group is refused by the planner. This is one of
+  the three safety probes in the benchmark.
+- **Does fair mode respect a budget?** Yes. In fair mode the budget is enforced on the real
+  expected spend, not on the equalised values.
+- **Why is the under-18 band at zero in the age chart?** Minors are never contacted, by rule.
+  That band and "unknown" are left out of the fairness ratio.
 - **Is this the first system of its kind?** We do not claim that. To our knowledge, the
   combination of a per-customer profit rule, replay evidence and a fenced local agent is not
   common in class projects, and that is all we say.

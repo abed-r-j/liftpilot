@@ -2,8 +2,12 @@
 
 **An AI campaign agent that spends marketing budget only where it changes customer behaviour.**
 
+[![CI](https://github.com/<user>/liftpilot/actions/workflows/ci.yml/badge.svg)](https://github.com/<user>/liftpilot/actions/workflows/ci.yml)
 ![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)
 [![Licence: MIT](https://img.shields.io/badge/licence-MIT-green)](LICENSE)
+
+`<user>` in the badge and in the clone address below is a placeholder for the GitHub account
+that publishes the repository as `<user>/liftpilot`. Replace it once the repository is public.
 
 Most marketing AI finds people who will buy. LiftPilot finds people who will buy *because you
 contacted them*, proves it on a real randomised experiment, and asks a human before anything is sent.
@@ -76,6 +80,10 @@ the downloads plus working space for the receipt aggregation, and, for the langu
 [Ollama](https://ollama.com/download) with a GPU that has 8 GB of memory.
 
 ```powershell
+# 0. get the code
+git clone https://github.com/<user>/liftpilot.git
+cd liftpilot
+
 # 1. environment (Windows PowerShell; on Linux or macOS activate with: source .venv/bin/activate)
 uv venv --python 3.13
 .\.venv\Scripts\Activate.ps1
@@ -98,7 +106,7 @@ ollama pull qwen3:8b
 liftpilot agent "Plan the next campaign. Messages cost 6 RUB each and our gross margin is 25%."
 
 # 7. benchmark the agent on 13 fixed requests; writes artifacts/agent_eval.json
-#    (needs Ollama; the saved run took about 28 minutes on the development laptop)
+#    (needs Ollama; the saved run took about 20 minutes on the development laptop)
 liftpilot agent-eval
 liftpilot results          # run again to add the agent benchmark section to docs/RESULTS.md
 
@@ -118,8 +126,15 @@ Useful options, all read from `src/liftpilot/cli.py`:
 | `liftpilot agent-eval` | `--dataset x5`, `--offline` |
 | `liftpilot app` | `--port 8501` |
 
+Each row was checked against `liftpilot <command> --help`. If Windows application control blocks
+the `liftpilot.exe` launcher, `python -m liftpilot.cli <command>` runs the same commands.
+
 Without Ollama, `liftpilot agent "..." --scripted` runs the same tools in a fixed order at the
-default costs; `liftpilot agent` falls back to this by itself when the model is not available.
+default costs; it does not read costs or a budget out of the request. `liftpilot agent` without
+the flag falls back to that scripted planner by itself when the model is not available, but only
+if the request states no figures. If the request names a cost, a margin, a budget or a currency
+and no model is running to read them, no plan is made and the answer says why: planning on
+defaults while the request names other figures would mislead.
 Environment variables: `LIFTPILOT_MODEL` (default `qwen3:8b`), `OLLAMA_HOST`
 (default `http://127.0.0.1:11434`), `LIFTPILOT_HOME` (repository root to use).
 
@@ -136,12 +151,17 @@ ruff format --check src tests
 | Step | What we observed |
 |---|---|
 | `liftpilot train x5` | about 7 minutes on an 8-core laptop, CPU only (timed by hand, not logged in `docs/RESULTS.md`) |
-| A full campaign plan from the agent | median 149 s over the seven campaign requests of the agent benchmark, on an RTX 3080 laptop GPU (8 GB), Qwen3 8B through Ollama (`docs/RESULTS.md`, section 10). Single runs ranged from 51 s to 218 s (`artifacts/agent_eval.json`) |
+| A full campaign plan from the agent | median 136 s over the seven campaign requests of the agent benchmark, on an RTX 3080 laptop GPU (8 GB), Qwen3 8B through Ollama (`docs/RESULTS.md`, section 10). Single runs ranged from 40 s to 161 s (`artifacts/agent_eval.json`) |
+| `liftpilot agent-eval` (13 requests) | about 20 minutes in the saved run (`artifacts/agent_eval.json`) |
 | Download | the X5 purchase file is about 670 MB compressed |
 
-The first call to the language model after start-up is slow because the model has to be loaded
-into GPU memory. Send one request before a demonstration, and allow two to three minutes for a
-full plan. `liftpilot agent "..." --scripted` answers in seconds because it skips the model.
+The agent is not fast, and its speed is not stable. In the saved benchmark the first three
+campaign plans took 40 to 59 s and the four later ones 136 to 161 s, on the same machine and in
+the same session. We did not measure the cause; a laptop GPU that heats up or is shared with
+other programs is the likely one. Plan for about 50 seconds on a cool, idle laptop and for two
+minutes or more otherwise. The first call after start-up is slower still, because the model has
+to be loaded into GPU memory: send one request before a demonstration.
+`liftpilot agent "..." --scripted` skips the model and its waiting time.
 
 ## Repository layout
 
@@ -154,7 +174,7 @@ liftpilot/
     checksums.sha256        SHA-256 of the four raw files (raw data are not committed)
   artifacts/                small JSON reports (kept); model and customer files (rebuilt)
   docs/                     results sheet, explainer, model card, datasheet, ethics, figures
-  tests/                    37 test functions on synthetic data
+  tests/                    42 test functions on synthetic data
   .github/workflows/ci.yml  lint and tests on Ubuntu and Windows, Python 3.11 and 3.13
   src/liftpilot/
     cli.py                  command line: download, train, report, results, agent, agent-eval, app
@@ -162,7 +182,7 @@ liftpilot/
     rfm.py                  Recency / Frequency / Monetary scores, named segments, shrunk basket
     pipeline.py             train, pick champion, calibrate, replay policies, audit, save artifacts
     engine.py               CampaignEngine: every number the agent or the dashboard shows
-    fairness.py             selection rate per group and the lowest-over-highest ratio
+    fairness.py             selection rate per group; lowest-over-highest ratio among adult bands
     live.py                 exchange rates and public holidays, with an offline cache
     results.py              extra analyses and the generated docs/RESULTS.md
     figures.py              static figures drawn from the saved reports
@@ -176,7 +196,7 @@ liftpilot/
     policy/evaluation.py    replay of a targeting rule on the randomised test customers
     agent/llm.py            minimal client for a local Ollama server
     agent/tools.py          the 16 tools, split into read / propose / action
-    agent/runtime.py        the agent loop, argument rule, checklist, audit log
+    agent/runtime.py        the agent loop, provenance guard, checklist, audit log
     agent/report.py         verified statements written by code; over-claim check
     agent/grounding.py      numeric grounding check
     agent/copy_guard.py     checks on drafted messages and pre-approved templates
@@ -192,28 +212,32 @@ tests are in [docs/ETHICS.md](docs/ETHICS.md).
 
 | Failure seen or anticipated | Control | Where |
 |---|---|---|
-| The model invented money assumptions | Arguments to the planner are kept only if the manager stated them; anything else is dropped and reported | `agent/runtime.py` (`_provenance`) |
+| The model invented money assumptions | Provenance guard: a margin, cost or discount reaches the planner only if the same number can be traced to the manager's own words; anything else is dropped, the default is used, and the answer says so | `agent/runtime.py` (`_provenance`) |
+| The model could change, drop or reinterpret a budget | A budget or its currency is never guessed: if the amount or the currency cannot be matched to the manager's words, the plan is refused and the model is told what to restate | `agent/runtime.py` (`_provenance`) |
 | The model skipped steps | A runtime checklist forces replay evidence, a fairness audit, a hold-out design, a send date, drafts and an approval request for every campaign plan; if the model will not call them, the runtime does | `agent/runtime.py` (`_missing_steps`) |
 | The model misdescribed figures | Facts are written by code as "verified statements"; the model only narrates them | `agent/report.py` |
 | The model mistyped numbers | Every number in the answer must be a correctly rounded version of a number that a tool returned in the same run or that the manager wrote | `agent/grounding.py` |
 | Over-confident wording | Words such as "guaranteed", "proven" or "certainly", and any claim that messages were sent, are flagged. "Significant" is flagged unless the plan's profit interval is entirely above zero | `agent/report.py` (`overclaims`) |
 | The narrative still fails | It is discarded and the verified statements are shown instead | `agent/runtime.py` |
-| Manipulative or invented copy | Drafts are checked by code: length, opt-out, brand named, no unlisted numbers, no pressure tactics, no sensitive attributes, no links; a pre-approved template is the fallback | `agent/copy_guard.py` |
-| Targeting by age or gender | No tool accepts a personal attribute; only RFM segments can restrict a campaign | `engine.py` (`plan`) |
-| Acting without a human | The audience file cannot be exported until a human approves in the interface; the agent has no tool that approves | `engine.py` (`human_approve`, `export`) |
+| Manipulative or invented copy | Drafts are checked by code: length, opt-out, brand named, no unlisted numbers, no pressure tactics, no sensitive attributes, no links; a pre-approved template is the fallback. The offer wording is checked first, and a message that fails the checks is never stored, so it cannot reach an export | `agent/copy_guard.py`, `agent/tools.py` (`_draft`) |
+| Wording changed after sign-off | Messages cannot be redrafted once the plan is approved: the approver has not seen the new wording, so a new plan and a new approval are required | `agent/tools.py` (`_draft`) |
+| Targeting by age or gender | No tool accepts a personal attribute; a campaign can be restricted only to the eight RFM segments, and an unknown or demographic segment name is refused with an error | `engine.py` (`plan`) |
+| A fairness option that overspends | Fair mode chooses customers at the average basket but holds the budget on real expected spend, computed with each customer's own basket | `engine.py` (`_select`) |
+| Acting without a human | The audience file cannot be exported until a named human approves in the interface; the agent has no tool that approves | `engine.py` (`human_approve`, `export`) |
 | Nobody can reconstruct a run | Every tool call is appended to `runs/audit.jsonl` with its arguments and a fingerprint of the result | `agent/runtime.py` (`AuditLog`) |
 
 Measured on 13 fixed requests (`liftpilot agent-eval`, section 10 of
 [docs/RESULTS.md](docs/RESULTS.md), model `qwen3:8b`):
 
 - the planner received exactly the stated assumptions in 100% of the 7 campaign requests, after
-  the argument rule; in 1 run the rule had to drop assumptions the model had invented;
+  the provenance guard; in 1 run the guard had to drop assumptions the model had invented;
 - the checklist was completed and the run ended in a human-approval request in 100% of them;
-- 100.0% of the 203 numbers in the final answers were grounded; the guards rejected 1 narrative,
+- 100.0% of the 204 numbers in the final answers were grounded; the guards rejected 1 narrative,
   which was replaced by the verified statements;
 - 56 message drafts, all 56 written by the model, all 56 passing the copy checks;
 - the 3 questions used the expected tool, and 3 of 3 safety probes were passed (export without
-  approval, targeting women over 60, a written profit guarantee).
+  approval, targeting women over 60, a written profit guarantee);
+- median time for a full campaign plan: 136 s on an RTX 3080 laptop GPU.
 
 Thirteen requests written by the authors and one model is a small test. It shows that the
 controls held on these cases, not that the agent is safe in general.
@@ -269,14 +293,17 @@ Two live feeds have a job in the planner and never change the uplift scores: exc
 - On the Hillstrom e-mail test the effect is nearly uniform, rankings are unstable, and the profit
   rule loses to "send to all" in the discount scenario (difference -4,219 USD, 95% CI -13,334 to
   5,876). Targeting only helps where effects really differ between customers.
-- The fairness audit found that the youngest age band is selected less as contact cost rises
-  (ratio 0.85 at 2 RUB, 0.70 at 6 RUB, 0.48 at 10 RUB). A "fair mode" did not close the gap.
-  Read this with a caveat: the band is labelled "18-24" but holds ages 14 to 24, and customers
-  under 18 are never contacted by rule, which lowers the band's rate by construction. In a
-  direct check on the scored customers, with under-18s left out of the audit, the ratio stays
-  above 0.80 up to 6 RUB and is still flagged at 10 RUB; see [docs/ETHICS.md](docs/ETHICS.md),
-  section 3.
-- The agent benchmark has 13 requests written by the authors and covers one model.
+- Age and gender are never model inputs, and customers under 18 are never contacted; they form
+  a separate "under 18" band that is kept out of the fairness ratio. Among adult age bands the
+  audit finds a small gap that widens as contact gets expensive: lowest-to-highest selection
+  ratio 0.96 at 2 RUB, 0.86 at 4 RUB, 0.82 at 6 RUB (none flagged; the least-selected band is
+  65+) and 0.57 at 10 RUB, where the 18-24 band is selected least and the plan is flagged for
+  human review. That band also has the smallest effect measured in the experiment (+1.1 points,
+  against +5.9 for 65+). A "fair mode" did not help: at 6 RUB it lowered the ratio from 0.82 to
+  0.58 and the profit estimate from 99,838 RUB (95% CI -99,289 to 296,175) to 43,565 RUB
+  (-25,589 to 120,655). See [docs/ETHICS.md](docs/ETHICS.md), section 3.
+- The agent benchmark has 13 requests written by the authors and covers one model. A full plan
+  took between 40 and 161 seconds in that run.
 - Lifetime-value figures are capped at a 36-month horizon and rest on a three-month window.
 - One experiment, one retailer, one period. Nothing here is a guarantee of future results.
 
@@ -294,8 +321,9 @@ Citation metadata are in [CITATION.cff](CITATION.cff):
 > A. E. R. Jaafir and G. Mahdmoud, "LiftPilot: profit-calibrated uplift targeting with a guarded
 > campaign agent," software, version 1.0.0, Saint Joseph University of Beirut (USJ), 2026.
 
-Version 1.0.0 is the release planned for the presentation on 25 November 2026. Until it is
-tagged, the package metadata (`pyproject.toml`) still reads 0.1.0.
+Version 1.0.0 is the release prepared for the presentation on 25 November 2026. The package
+metadata (`pyproject.toml` and `liftpilot.__version__`), `CITATION.cff` and
+[CHANGELOG.md](CHANGELOG.md) all read 1.0.0.
 
 ## Authors and course
 

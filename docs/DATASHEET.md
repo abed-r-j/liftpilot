@@ -38,7 +38,7 @@ in [RESULTS.md](RESULTS.md) are taken from there.
 | Group sizes and rates | 99,981 contacted and 100,058 held out; purchase rate 63.65% versus 60.33%; difference +3.32 points (95% CI +2.90 to +3.75) | Measured |
 | Is there a monetary outcome? | No. Amounts exist only in the purchase history before the campaign (`purchase_sum`) | Measured |
 | Time span of the purchase history | First receipt 2018-11-21, last receipt 2019-03-18. RESULTS.md prints the window as 2018-11-21 to 2019-03-19 because its second date is the reference date for recency, the day after the last receipt. Purchases are the "purchase history prior to communication" [3] | Measured; Source |
-| Sub-populations | Age and gender are present. Gender is coded `M`, `F`, `U` (unknown). 1,779 customers have no valid age (outside 14 to 100) | Measured |
+| Sub-populations | Age and gender are present. Gender is coded `M`, `F`, `U` (unknown). 1,779 customers have no valid age (outside 14 to 100). Valid ages start at 14, so the files include customers under 18 | Measured |
 | Missing data | `first_redeem_date` is empty for some customers; 200,123 of the 400,162 customers have no treatment flag in the files we use | Measured |
 | Does it identify people? | Customers appear under an opaque `client_id`. The files contain no names or contact details. Age, gender and a detailed purchase history are present | Measured |
 | Sensitive attributes | Age and gender | Measured |
@@ -70,10 +70,10 @@ All steps are in `src/liftpilot/data/x5.py` and `src/liftpilot/data/prepare.py`.
 - Leakage guard: `first_redeem_date` can fall after the end of the purchase history, so only
   redemptions dated before the reference date become features.
 - Ages outside 14 to 100 are set to missing (1,779 customers without a valid age). Age is
-  grouped into bands for auditing only. The band labelled "18-24" holds every valid age under
-  25, that is ages 14 to 24. Customers under 18 are never eligible for contact but are still
-  counted in that band, which matters when reading the fairness audit
-  (see [ETHICS.md](ETHICS.md), section 3).
+  grouped into bands for auditing only: under 18, 18-24, 25-34, 35-44, 45-54, 55-64, 65+, and
+  "unknown" for customers without a valid age. Customers under 18 are never eligible for
+  contact, so the "under 18" band has a selection rate of zero by rule; it and the "unknown"
+  band are left out of the fairness ratio (see [ETHICS.md](ETHICS.md), section 3).
 - Age and gender are **not** model inputs. They are kept only to audit who is selected.
 - Revenue of a buyer is **imputed**: the purchase amount after the campaign is not in the data,
   so a purchase is valued at that customer's own average basket, shrunk towards the overall mean

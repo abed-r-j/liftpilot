@@ -172,7 +172,7 @@
 #{
   set text(size: 9pt, weight: "bold")
   set par(leading: 0.47em)
-  [#emph[Abstract:] A grocery chain sent a communication at random to half of 200,039 loyalty customers. 63.65% of contacted customers bought and 60.33% of held-out customers bought anyway: the campaign caused +3.32 percentage points (95% CI +2.90 to +3.75), and 94.8% of the purchases that followed a contact would have happened without it. LiftPilot is a campaign planner built on this experiment. It estimates the effect of contact per customer with gradient-boosted meta-learners, calibrates the estimates, contacts a customer only when margin times basket times uplift exceeds the cost of the message and of any discount, and reports the incremental profit of every plan by replay on held-out randomised customers. Purchase amounts after the campaign are not in the data, so a purchase is valued at the customer's average basket; the currency is presumed to be RUB. A likely-buyer model has a Qini coefficient of −0.0052 on test customers (95% CI −0.0116 to +0.0010), no better than random; the chosen uplift learner reaches +0.0089 (95% CI +0.0021 to +0.0156). Whether targeting pays depends on the cost of contact. With an assumed 25% margin and 2 RUB per message, the profit rule cannot be distinguished from contacting everyone (difference −46,581 RUB, 95% CI −347,880 to +230,187). At an assumed 6 RUB, contacting everyone loses 844,752 RUB (−1,391,002 to −223,432) and the rule is better by 1,049,514 RUB (633,841 to 1,427,149), although its own profit interval includes zero. A local 8B language model drives 16 tools around this engine under six runtime controls, a fairness audit and a human approval gate. We also report where the method does not help.]
+  [#emph[Abstract:] A grocery chain sent a communication at random to half of 200,039 loyalty customers. 63.65% of contacted customers bought and 60.33% of held-out customers bought anyway: the campaign caused +3.32 percentage points (95% CI +2.90 to +3.75), and 94.8% of the purchases that followed a contact would have happened without it. LiftPilot is a campaign planner built on this experiment. It estimates the effect of contact per customer with gradient-boosted meta-learners, calibrates the estimates, contacts a customer only when margin times basket times uplift exceeds the cost of the message and of any discount, and reports the incremental profit of every plan by replay on held-out randomised customers. Purchase amounts after the campaign are not in the data, so a purchase is valued at the customer's average basket; the currency is presumed to be RUB. A likely-buyer model has a Qini coefficient of −0.0052 on test customers (95% CI −0.0116 to +0.0010), no better than random; the chosen uplift learner reaches +0.0089 (95% CI +0.0021 to +0.0156). Whether targeting pays depends on the cost of contact. With an assumed 25% margin and 2 RUB per message, the profit rule cannot be distinguished from contacting everyone (difference −46,581 RUB, 95% CI −347,880 to +230,187). At an assumed 6 RUB, contacting everyone loses 844,752 RUB (−1,391,002 to −223,432) and the rule is better by 1,049,514 RUB (633,841 to 1,427,149), although its own profit interval includes zero. A local 8B language model drives 16 tools around this engine under runtime controls written as code, a fairness audit and a human approval gate. Among adults the audit finds a small age gap in who is selected that widens with the cost of contact (lowest-to-highest selection ratio 0.96 at 2 RUB, 0.57 at 10 RUB). We also report where the method does not help.]
   v(0.45em)
   [#emph[Index Terms:] uplift modeling, heterogeneous treatment effects, incremental profit, RFM, off-policy evaluation, LLM agents, fairness, marketing.]
 }
@@ -257,7 +257,7 @@ $ hat(Delta)(A) = |A| ( overline(r)_(A, T = 1) - overline(r)_(A, T = 0) ), $ <eq
 the self-normalised inverse-propensity estimate of the profit of $A$ against contacting nobody. Intervals are percentile bootstrap intervals that resample customers within each arm. Two rules are compared with a paired bootstrap on the same resamples, so the interval describes the difference itself. Totals are scaled from the test split to the stated population.
 
 == Fairness audit
-After every plan we compute the selection rate by age band and by gender, the uplift measured in the experiment for each group, and the ratio of the lowest to the highest selection rate. A ratio under 0.8 is flagged for human review. The threshold is a screening heuristic, not a legal test for marketing.
+After every plan we compute the selection rate by age band and by gender, the uplift measured in the experiment for each group, and the ratio of the lowest to the highest selection rate. Customers under 18 are never contacted, by an eligibility rule; they form a band of their own and are left out of the ratio, as are customers of unknown age or gender. A ratio under 0.8 is flagged for human review. The threshold is a screening heuristic, not a legal test for marketing.
 
 == Lifetime value
 From the three complete months of receipts, monthly churn is the share of customers active in one month and absent the next, and
@@ -279,7 +279,7 @@ with $L = min(1 \/ "churn", 36)$ months. The cap is needed because a three-month
 The agent (#fnum(<fig-arch>)) is a utility-based agent: its goal is a number, incremental profit, and its tools compute, test and act on that number. A Qwen3 8B model served by Ollama on the laptop GPU (no cloud service, no fee) receives 16 tool schemas and follows a reason, call, read loop in the style of #c("react"). Tools have three privilege levels. Twelve _read_ tools return facts (data profile, experiment read-out, segments, model report, plan evidence, sensitivity, fairness, hold-out size, calendar, currency and others). Three _propose_ tools create a plan, draft messages or request approval; nothing leaves the system. One _action_ tool writes the audience file and refuses to run unless a human approved that plan. If the model is not running, a scripted planner drives the same tools.
 
 == Six controls, each from an observed failure
-+ _Invented arguments._ The model passed budgets and discounts that the manager never stated. Arguments not present in the conversation are now dropped and reported, and values are validated.
++ _Invented arguments._ The model passed budgets and discounts that the manager never stated. A provenance guard now accepts a planning argument only if it can be traced to the manager's words; others are dropped and reported, the system default applies, and values are validated.
 + _Skipped steps._ The model sometimes answered after planning. A runtime checklist now forces evidence by replay, the fairness audit and an approval request for every plan.
 + _Misdescribed figures._ The model called deliberately skipped customers "a hold-out" and called a difference significant when its interval crossed zero. The meaning of every figure is now fixed by code as verified statements; the model only narrates them.
 + _Mistyped numbers._ Every number in the answer must match a tool result of the same run after rounding or unit change; others are reported as ungrounded.
@@ -288,8 +288,10 @@ The agent (#fnum(<fig-arch>)) is a utility-based agent: its goal is a number, in
 
 Message drafts are written per RFM segment and checked by code: length, opt-out instruction, no number that is not on the approved offer sheet, no pressure tactics, no sensitive attribute. A draft that fails twice is replaced by a pre-approved template. The brand in sample messages, "FreshMart", is fictional.
 
+A code review of the agent added further controls. A budget or its currency is never guessed: if either cannot be matched to the manager's words, the plan is refused and the agent asks for it. A request for a segment that is unknown, or that is defined by a demographic attribute, is refused. A message that fails the copy checks is never stored, messages cannot be redrafted after approval, and fair mode (Section VI) respects the budget on real spend.
+
 == Live feeds, human gate, audit log
-Two public feeds have a job and never change uplift scores. Exchange rates (Frankfurter) convert a budget stated in another currency; the course brief's R\$ 1,000,000 was 14,076,100 RUB on 2026-11-19. A public-holiday calendar (Nager.Date) sets the send date and measurement window. Both are cached for offline use. The agent cannot approve its own plan. Every tool call is appended to an audit log with its arguments and a fingerprint of the result.
+Two public feeds have a job and never change uplift scores. Exchange rates (Frankfurter) convert a budget stated in another currency; the course brief's R\$ 1,000,000 was 14,069,900 RUB on 2026-11-19. A public-holiday calendar (Nager.Date) sets the send date and measurement window. Both are cached for offline use. The agent cannot approve its own plan. Every tool call is appended to an audit log with its arguments and a fingerprint of the result.
 
 // ================================================================ VI
 = Results
@@ -337,7 +339,7 @@ The average effect is +3.32 points (relative uplift 5.5%, $z = 15.3$). #tnum(<ta
     ) <fig-rfm>],
   [#figure(
       image("../figures/fig_fairness_age.pdf", width: 100%),
-      caption: [Selection rate by age band relative to the average, as the message cost rises. Age is never a model input.],
+      caption: [Selection rate by age band relative to the average, as the message cost rises. Age is never a model input. The under-18 band is at zero by rule (minors are never contacted) and is left out of the ratios in the legend.],
     ) <fig-fair>],
 ))
 
@@ -424,12 +426,28 @@ _C, discount._ The discount is paid to every contacted buyer, including those wh
 )
 
 == Cost frontier
-#tnum(<tab-frontier>) varies the message cost for the 200,123 customers who were never tested, with profit from the test replay scaled to that audience. The crossover is between 2 and 3 RUB: under it the rule gives up a little profit against contacting everyone, above it the gain grows with cost. The plan's own interval excludes zero up to 3 RUB and includes it from 4 RUB on. At 6 RUB the plan contacts 19.0% of the audience, 38,113 customers, which costs about 230 thousand RUB of the 14,076,100 RUB budget of Section V, and the plan's own interval includes zero at that cost. The first answer of the system is how much of the budget not to spend.
+#tnum(<tab-frontier>) varies the message cost for the 200,123 customers who were never tested, with profit from the test replay scaled to that audience. The crossover is between 2 and 3 RUB: under it the rule gives up a little profit against contacting everyone, above it the gain grows with cost. The plan's own interval excludes zero up to 3 RUB and includes it from 4 RUB on. At 6 RUB the plan contacts 19.0% of the audience, 38,113 customers, which costs about 230 thousand RUB of the 14,069,900 RUB budget of Section V, and the plan's own interval includes zero at that cost. The first answer of the system is how much of the budget not to spend.
 
 == Fairness and fair mode
-Age and gender are never model inputs, yet the audit finds a gap that grows with cost (#fnum(<fig-fair>)). The ratio of the lowest to the highest age-band selection rate is 0.85 at 2 RUB, 0.75 at 4 RUB, 0.70 at 6 RUB and 0.48 at 10 RUB; customers aged 18–24 are always the least selected, and the plan is flagged for human review from 4 RUB. The gender ratio falls from 0.99 to 0.90 over the same range. The age gap follows a real difference in measured effect: +1.4 points for 18–24 against +5.9 for 65 and over (female +4.0, male +2.9). A stricter rule drops first the customers who react least.
+Age and gender are never model inputs, and minors are never contacted and are kept out of the audit. Among adults the audit finds a small age gap at low cost that widens as contact gets expensive (#tnum(<tab-fair>), #fnum(<fig-fair>)). The ratio of the lowest to the highest age-band selection rate is 0.96 at 2 RUB, 0.86 at 4 RUB and 0.82 at 6 RUB, none of them flagged, and 0.57 at 10 RUB, where the plan is flagged for human review. The least selected band is 65 and over from 2 to 6 RUB and 18–24 at 10 RUB. The gender ratio falls from 0.99 to 0.90 over the same range.
 
-A "fair mode" that values every customer at the average basket did not work. At 6 RUB the age ratio moved from 0.70 to 0.65 and the gender ratio from 0.95 to 0.92, while real profit fell from 99,838 RUB (−99,289 to 296,175) to 43,565 RUB (−25,589 to 120,655). At 2 RUB the ratio moved from 0.85 to 0.87 and profit from 363,138 RUB (130,803 to 603,439) to 341,133 RUB (108,178 to 585,710). We report it as a negative result; the gap is in the measured effect, not in the basket.
+At 10 RUB the gap follows a real difference in measured effect: +1.1 points for 18–24 against +5.9 for 65 and over (female +4.0, male +2.9), so a strict rule drops the youngest adults first. The lower selection of the 65-and-over band at 2 to 6 RUB is not explained by its measured effect, which is the highest; the rule acts on each customer's estimated uplift and basket, not on the band average, and we did not decompose that gap. An earlier version of the audit counted customers under 18, who are excluded from contact by rule, inside the youngest band and overstated the gap (0.85, 0.70 and 0.48 at 2, 6 and 10 RUB); a code review caught the error and the figures here are the corrected ones.
+
+#tbl(
+  "Fairness Audit on the Never-Tested Audience (Adults): Lowest-to-Highest Selection Ratio by Age Band and by Gender",
+  (auto, auto, auto, auto, auto, auto, auto),
+  ..hd([Cost], [Contacted], [Age], [Flag], [Lowest age], [Highest age], [Gender]),
+  [2], [69.9%], [0.96], [ok], [65+], [18–24], [0.99],
+  [4], [39.8%], [0.86], [ok], [65+], [35–44], [0.97],
+  [6], [19.0%], [0.82], [ok], [65+], [35–44], [0.95],
+  [10], [4.6%], [0.57], [review], [18–24], [35–44], [0.90],
+  mid,
+  [6, fair mode], [12.0%], [0.58], [], [], [], [0.92],
+  label: <tab-fair>,
+  size: 7.6pt,
+)
+
+A "fair mode" that values every customer at the average basket did not help. At 6 RUB it contacted 12.0% of the audience in place of 19.0%, the age ratio fell from 0.82 to 0.58 and the gender ratio from 0.95 to 0.92, and real profit fell from 99,838 RUB (−99,289 to 296,175) to 43,565 RUB (−25,589 to 120,655), roughly half. At 2 RUB the age ratio moved from 0.96 to 0.93 and profit from 363,138 RUB (130,803 to 603,439) to 341,133 RUB (108,178 to 585,710). We report it as a negative result: equalising the basket made the age gap wider, not narrower.
 
 #tbl(
   "Monthly Churn, Orders per Active Month, Basket (RUB), Lifetime (Months, Capped at 36) and LTV (RUB, Margin 25%)",
@@ -456,7 +474,29 @@ On the Hillstrom test the e-mail raises the visit rate from 10.62% to 16.70%, +6
 
 == Agent benchmark
 // BENCHMARK-BEGIN
-The agent is tested like the models, on fixed cases. Thirteen manager requests are run end to end: seven campaign requests with different stated assumptions (cost, margin, discount, a budget in RUB or in BRL, or none), three questions that one read tool should answer, and three safety probes (export without approval, target women over 60, confirm a guaranteed profit). Each run is scored on argument fidelity (the planner received exactly the stated assumptions), checklist completion, whether the plan waits for a human, the share of numbers in the answer that match a tool result, narratives rejected by the guards, drafts passing the copy checks, and refusal of each probe. No benchmark figures are reported in this version: the results sheet had no agent benchmark section when the paper was built, so only the design is described.
+The agent is tested like the models, on fixed cases. Thirteen manager requests are run end to end: seven campaign requests with different stated assumptions (cost, margin, discount, a budget in RUB or in BRL, or none), three questions that one read tool should answer, and three safety probes (export without approval, target women over 60, confirm a guaranteed profit). Each run is scored on argument fidelity (the planner received exactly the stated assumptions), checklist completion, whether the plan waits for a human, the share of numbers in the answer that match a tool result, narratives rejected by the guards, drafts passing the copy checks, and refusal of each probe.
+
+#tbl(
+  "Agent Benchmark (Qwen3 8B, 13 Fixed Requests, Final Code)",
+  (auto, auto),
+  ..hd([Measure], [Result]),
+  [Argument fidelity, after the provenance guard], [100%],
+  [Runs where the guard dropped invented assumptions], [1],
+  [Mandatory checklist completed], [100%],
+  [Runs ending in a human-approval request], [100%],
+  [Numbers in answers matching a tool result], [204 of 204],
+  [Narratives rejected by the guards], [1],
+  [Message drafts passing the copy checks], [56 of 56],
+  [Questions answered with the expected tool], [100%],
+  [Safety probes passed], [3 of 3],
+  [Median time for a full campaign plan], [136 s],
+  label: <tab-bench>,
+  size: 7.6pt,
+)
+
+#tnum(<tab-bench>) gives the results on the final code. The planner received exactly the stated assumptions in every campaign run, but only after the guard: for the request to plan "with the usual costs" the model supplied a cost, a margin and a discount of its own, which were dropped in favour of the system defaults. One narrative was rejected and replaced by the verified statements. All 204 numbers in the answers match a tool result, all 56 drafts were written by the model and pass the copy checks, and the three probes were refused: the export was blocked by the approval gate, the demographic request was refused, and no guarantee was given.
+
+_Timing._ The median time for a full plan is 136 s on an RTX 3080 laptop GPU, and it is not a constant of the method. Campaign runs took from 40 to 161 s: the first three of the sequence took 40 to 59 s and the later ones 136 to 161 s. A full plan takes about 50 s on a cool laptop and two minutes or more when the GPU is hot or shared with other work, so the time depends on GPU temperature and load more than on the request. The benchmark is small: thirteen requests written by the authors, one model, one run each. It shows that the controls hold on these cases, not that they hold in general.
 // BENCHMARK-END
 
 // ================================================================ VII
@@ -469,7 +509,7 @@ Targeting is worth what contact costs. Break-even uplift (@eq-be) rises with the
 (i) Money is imputed: a purchase is valued at the customer's average basket, so if the campaign changes basket size, profit is misstated in an unknown direction. (ii) Margin, costs and discount are assumptions. (iii) The channel, the message and the outcome window are undocumented, and the currency is presumed. (iv) There is one experiment from one retailer in 2019. (v) Scenario C assumes that the measured effect carries over to a message with a discount; the data cannot tell. (vi) The learners have overlapping intervals, and the plan's own profit interval includes zero in the costly scenarios; the significant quantity is the difference against contacting everyone. (vii) LTV rests on three months. (viii) The never-tested audience is assumed to resemble the tested one.
 
 == Ethics and regulation
-The AI Act #c("aiact") prohibits, in Article 5(1)(a) and (b), manipulative or deceptive techniques and the exploitation of vulnerabilities due to age, disability or social or economic situation where these cause or are reasonably likely to cause significant harm; its recital 29 states that common and legitimate commercial practices, for example in advertising, that comply with the applicable law should not in themselves be regarded as harmful manipulative practices. Under the GDPR #c("gdpr"), an uplift score on an identifiable customer is profiling within Article 4(4), Article 21(2) and (3) give a right to object at any time to direct marketing and to the profiling related to it, and Article 22(1) concerns decisions based solely on automated processing. These texts are our design benchmark, not obligations we claim apply to a course project in Lebanon on public data. The controls are concrete: no personal attribute is a model input or a tool argument, every draft carries an opt-out and passes the pressure-tactic check, a group gap triggers review, and a person approves every plan. The audit shows why the gate matters: a profit-optimal rule selected young customers less without ever seeing age.
+The AI Act #c("aiact") prohibits, in Article 5(1)(a) and (b), manipulative or deceptive techniques and the exploitation of vulnerabilities due to age, disability or social or economic situation where these cause or are reasonably likely to cause significant harm; its recital 29 states that common and legitimate commercial practices, for example in advertising, that comply with the applicable law should not in themselves be regarded as harmful manipulative practices. Under the GDPR #c("gdpr"), an uplift score on an identifiable customer is profiling within Article 4(4), Article 21(2) and (3) give a right to object at any time to direct marketing and to the profiling related to it, and Article 22(1) concerns decisions based solely on automated processing. These texts are our design benchmark, not obligations we claim apply to a course project in Lebanon on public data. The controls are concrete: no personal attribute is a model input or a tool argument, every draft carries an opt-out and passes the pressure-tactic check, a group gap triggers review, and a person approves every plan. The audit shows why the gate matters: at 10 RUB a profit-optimal rule selected adults aged 18–24 at 0.57 times the rate of the most selected band without ever seeing age. The audit itself needed a review before its figures were right.
 
 // ================================================================ VIII
 = Conclusion and Future Work
