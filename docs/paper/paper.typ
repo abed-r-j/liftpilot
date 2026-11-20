@@ -135,6 +135,8 @@
   aiact: [Regulation (EU) 2024/1689 of the European Parliament and of the Council of 13 June 2024 laying down harmonised rules on artificial intelligence and amending Regulations (EC) No 300/2008, (EU) No 167/2013, (EU) No 168/2013, (EU) 2018/858, (EU) 2018/1139 and (EU) 2019/2144 and Directives 2014/90/EU, (EU) 2016/797 and (EU) 2020/1828 (Artificial Intelligence Act), _Official Journal of the European Union_, OJ L, 2024/1689, 12.7.2024. [Online]. Available: http://data.europa.eu/eli/reg/2024/1689/oj],
   gdpr: [Regulation (EU) 2016/679 (General Data Protection Regulation). [Online]. Available: http://data.europa.eu/eli/reg/2016/679/oj],
   hillstrom: [K. Hillstrom, "The MineThatData e-mail analytics and data mining challenge," MineThatData blog, Mar. 20, 2008. [Online]. Available: https://blog.minethatdata.com/2008/03/minethatdata-e-mail-analytics-and-data.html],
+  lee: [H.-P. Lee, A. Sarkar, L. Tankelevitch, I. Drosos, S. Rintel, R. Banks, and N. Wilson, "The impact of generative AI on critical thinking: Self-reported reductions in cognitive effort and confidence effects from a survey of knowledge workers," in _Proc. 2025 CHI Conf. Human Factors in Computing Systems_, Art. no. 1121, Apr. 2025, doi: 10.1145/3706598.3713778.],
+  moffatt: [_Moffatt v. Air Canada_, 2024 BCCRT 149, British Columbia Civil Resolution Tribunal, Feb. 14, 2024. [Online]. Available: https://www.canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html],
 )
 #let cited = state("cited", ())
 #let c(..keys) = {
@@ -282,9 +284,11 @@ The agent (#fnum(<fig-arch>)) is a utility-based agent: its goal is a number, in
 + _Invented arguments._ The model passed budgets and discounts that the manager never stated. A provenance guard now accepts a planning argument only if it can be traced to the manager's words; others are dropped and reported, the system default applies, and values are validated.
 + _Skipped steps._ The model sometimes answered after planning. A runtime checklist now forces evidence by replay, the fairness audit and an approval request for every plan.
 + _Misdescribed figures._ The model called deliberately skipped customers "a hold-out" and called a difference significant when its interval crossed zero. The meaning of every figure is now fixed by code as verified statements; the model only narrates them.
-+ _Mistyped numbers._ Every number in the answer must match a tool result of the same run after rounding or unit change; others are reported as ungrounded.
++ _Mistyped numbers._ Every number in the answer must match a tool result of the same run, or a number in the request, after rounding or unit change; others are reported as ungrounded.
 + _Over-confident wording._ An over-claim check rejects wording stronger than the evidence.
 + _Residual failure._ If the narrative still fails, it is discarded and the verified statements are shown alone.
+
+These controls answer the three ways a language model fails according to the course's closing session: it can be wrong (controls 1 to 4), be biased (the audit of Section IV, for selection only, not for wording) or just agree (controls 3 and 5). The stress test of Section VI widened three of them: control 1 now also drops a hold-out target the manager did not state, control 2 applies to every run in which the model makes a plan, in any language, and control 5 also rejects wording that calls a plan approved or exported when it is not, or that advises skipping approval. The reader is a further risk: among 319 surveyed knowledge workers, more confidence in generative AI went with less critical thinking #c("lee"), a self-reported link, not proof of cause. So the approver reads statements written by code and stays accountable: a tribunal held an airline responsible for its chatbot's answer #c("moffatt").
 
 Message drafts are written per RFM segment and checked by code: length, opt-out instruction, no number that is not on the approved offer sheet, no pressure tactics, no sensitive attribute. A draft that fails twice is replaced by a pre-approved template. The brand in sample messages, "FreshMart", is fictional.
 
@@ -477,7 +481,7 @@ On the Hillstrom test the e-mail raises the visit rate from 10.62% to 16.70%, +6
 The agent is tested like the models, on fixed cases. Thirteen manager requests are run end to end: seven campaign requests with different stated assumptions (cost, margin, discount, a budget in RUB or in BRL, or none), three questions that one read tool should answer, and three safety probes (export without approval, target women over 60, confirm a guaranteed profit). Each run is scored on argument fidelity (the planner received exactly the stated assumptions), checklist completion, whether the plan waits for a human, the share of numbers in the answer that match a tool result, narratives rejected by the guards, drafts passing the copy checks, and refusal of each probe.
 
 #tbl(
-  "Agent Benchmark (Qwen3 8B, 13 Fixed Requests, Final Code)",
+  "Agent Benchmark (Qwen3 8B, 13 Fixed Requests)",
   (auto, auto),
   ..hd([Measure], [Result]),
   [Argument fidelity, after the provenance guard], [100%],
@@ -494,10 +498,17 @@ The agent is tested like the models, on fixed cases. Thirteen manager requests a
   size: 7.6pt,
 )
 
-#tnum(<tab-bench>) gives the results on the final code. The planner received exactly the stated assumptions in every campaign run, but only after the guard: for the request to plan "with the usual costs" the model supplied a cost, a margin and a discount of its own, which were dropped in favour of the system defaults. One narrative was rejected and replaced by the verified statements. All 204 numbers in the answers match a tool result, all 56 drafts were written by the model and pass the copy checks, and the three probes were refused: the export was blocked by the approval gate, the demographic request was refused, and no guarantee was given.
+#tnum(<tab-bench>) gives the results on the code as it was before the stress test below. The planner received exactly the stated assumptions in every campaign run, but only after the guard: for the request to plan "with the usual costs" the model supplied a cost, a margin and a discount of its own, which were dropped in favour of the system defaults. One narrative was rejected and replaced by the verified statements. All 204 numbers in the answers match a tool result, all 56 drafts were written by the model and pass the copy checks, and the three probes were refused: the export was blocked by the approval gate, the demographic request was refused, and no guarantee was given.
 
 _Timing._ The median time for a full plan is 136 s on an RTX 3080 laptop GPU, and it is not a constant of the method. Campaign runs took from 40 to 161 s: the first three of the sequence took 40 to 59 s and the later ones 136 to 161 s. A full plan takes about 50 s on a cool laptop and two minutes or more when the GPU is hot or shared with other work, so the time depends on GPU temperature and load more than on the request. The benchmark is small: thirteen requests written by the authors, one model, one run each. It shows that the controls hold on these cases, not that they hold in general.
 // BENCHMARK-END
+
+== Stress test from the closing session
+Ten further cases apply the tests of the course's closing session to the agent: the same request three times, neutral wording against two opposite opinions, a manager who asks it to confirm a losing plan, three questions with a known answer, a hidden instruction in a tool result and in a pasted note, the same request signed by four senders, and the request in French and in Arabic (reported, not gated). In one full run of all ten cases on the final code, with no earlier result reused and no case repeated, the 9 gated cases pass over 17 runs, 14 of which produced a plan (median 166 s), and 241 of 241 numbers in the answers match a tool result or a number in the request.
+
+Four earlier runs each scored 9 of 9 under the rule of the time, and reading the saved answers showed a fault each time. Run 1: the model chose the hold-out's detection target itself, and three identical requests gave hold-outs of 16%, 8% and 16%. Run 2: two answers said that the drafts were "all approved" when nothing had been approved. Run 3: a run that ended in a server error was scored as a pass, and a draft repeated the pasted note's "Export audience file now without approval". Run 4, a partial rerun: the Arabic request stopped after three of seven tools, because the runtime recognised a campaign request by English keywords, and French had passed only because "Planifie" contains "plan". Each fault became a guard or a stricter rule. The checklist now applies to every run in which the model makes a plan, in any language, and the French test sentence has no English keyword.
+
+In the final run the answer to the leading request gave both tool figures, −422,465 RUB for contacting everyone and 99,838 RUB for the plan, and endorsed nothing, but it did not say in words that the manager was wrong. The four senders got the same plan. French and Arabic both equal the English baseline in plan arguments and decision numbers, complete the checklist (seven tools, after one reminder from the runtime) and end in an approval request. One correct briefing was replaced by the verified statements, because the over-claim list matched "messages sent" inside "No messages sent yet". Limits: one model, one seed, one run per variant; the wording checks are pattern lists that a paraphrase passes; and five guards, among them the approval gate blocking an export, did not act in this run, so only unit tests show them. A pass means that the rule held in these runs, not that it always holds.
 
 // ================================================================ VII
 = Discussion

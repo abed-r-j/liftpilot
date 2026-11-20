@@ -8,7 +8,7 @@
 
 
 Most marketing AI finds people who will buy. LiftPilot finds people who will buy *because you
-contacted them*, proves it on a real randomised experiment, and asks a human before anything is sent.
+contacted them*, tests it on a real randomised experiment, and asks a human before anything is sent.
 
 It combines RFM segmentation, uplift modeling (estimating, per customer, how much a message
 changes the chance of a purchase), a calibrated profit rule, and a local language-model agent
@@ -108,6 +108,12 @@ liftpilot agent "Plan the next campaign. Messages cost 6 RUB each and our gross 
 liftpilot agent-eval
 liftpilot results          # run again to add the agent benchmark section to docs/RESULTS.md
 
+# 7b. stress-test the agent on 10 cases built from the course's closing session;
+#     writes artifacts/agent_stress.json (needs Ollama; 17 agent runs, median 166 s for a
+#     run that produced a plan, about 35 minutes for the saved run)
+liftpilot agent-stress
+liftpilot results --sheet-only   # rewrite docs/RESULTS.md from saved artifacts, compute nothing
+
 # 8. demo dashboard (Streamlit, http://localhost:8501)
 liftpilot app
 ```
@@ -119,9 +125,10 @@ Useful options, all read from `src/liftpilot/cli.py`:
 | `liftpilot download [x5\|hillstrom\|all]` | default `all` |
 | `liftpilot train [x5\|hillstrom]` | `--seed 0`, `--n-boot 300`, `--repeats 5`, `--rebuild` (rebuild the customer table from raw files) |
 | `liftpilot report [x5\|hillstrom]` | prints the saved evaluation report |
-| `liftpilot results` | `--offline` (use cached exchange rates) |
+| `liftpilot results` | `--offline` (use cached exchange rates), `--sheet-only` (only rewrite `docs/RESULTS.md` from the saved artifacts; compute nothing) |
 | `liftpilot agent "<request>"` | `--dataset x5`, `--scripted` (no language model, fixed tool order), `--offline` (cached live data), `--show-results` (print each tool result) |
 | `liftpilot agent-eval` | `--dataset x5`, `--offline` |
+| `liftpilot agent-stress` | `--dataset x5`, `--offline`, `--case <id>` (run only this case; repeat the option for several). Writes `artifacts/agent_stress.json` after every case |
 | `liftpilot app` | `--port 8501` |
 
 Each row was checked against `liftpilot <command> --help`. If Windows application control blocks
@@ -172,10 +179,11 @@ liftpilot/
     checksums.sha256        SHA-256 of the four raw files (raw data are not committed)
   artifacts/                small JSON reports (kept); model and customer files (rebuilt)
   docs/                     results sheet, explainer, model card, datasheet, ethics, figures
-  tests/                    42 test functions on synthetic data
+  tests/                    75 test functions on synthetic data
   .github/workflows/ci.yml  lint and tests on Ubuntu and Windows, Python 3.11 and 3.13
   src/liftpilot/
-    cli.py                  command line: download, train, report, results, agent, agent-eval, app
+    cli.py                  command line: download, train, report, results, agent, agent-eval,
+                            agent-stress, app
     config.py               project paths
     rfm.py                  Recency / Frequency / Monetary scores, named segments, shrunk basket
     pipeline.py             train, pick champion, calibrate, replay policies, audit, save artifacts
@@ -199,6 +207,8 @@ liftpilot/
     agent/grounding.py      numeric grounding check
     agent/copy_guard.py     checks on drafted messages and pre-approved templates
     agent/evaluate.py       the agent benchmark
+    agent/stress.py         stress cases built from the course's closing session
+    agent/check.py          the five CHECK lines shown before approval, written from tool results
     app/main.py             Streamlit dashboard
 ```
 
@@ -213,10 +223,14 @@ tests are in [docs/ETHICS.md](docs/ETHICS.md).
 | The model invented money assumptions | Provenance guard: a margin, cost or discount reaches the planner only if the same number can be traced to the manager's own words; anything else is dropped, the default is used, and the answer says so | `agent/runtime.py` (`_provenance`) |
 | The model could change, drop or reinterpret a budget | A budget or its currency is never guessed: if the amount or the currency cannot be matched to the manager's words, the plan is refused and the model is told what to restate | `agent/runtime.py` (`_provenance`) |
 | The model skipped steps | A runtime checklist forces replay evidence, a fairness audit, a hold-out design, a send date, drafts and an approval request for every campaign plan; if the model will not call them, the runtime does | `agent/runtime.py` (`_missing_steps`) |
+| An Arabic request stopped after three tools | A run in which the model itself made a plan must complete the whole checklist, whatever the language of the request; English keywords are only a second trigger | `agent/runtime.py` (`_missing_steps`) |
+| The model chose the hold-out's detection target itself, and not the same one each time | A detection target is kept only if it is a fraction between 0 and 1 that the manager wrote next to detection wording (English only); otherwise the default is used | `agent/runtime.py` (`_holdout_provenance`) |
 | The model misdescribed figures | Facts are written by code as "verified statements"; the model only narrates them | `agent/report.py` |
 | The model mistyped numbers | Every number in the answer must be a correctly rounded version of a number that a tool returned in the same run or that the manager wrote | `agent/grounding.py` |
 | Over-confident wording | Words such as "guaranteed", "proven" or "certainly", and any claim that messages were sent, are flagged. "Significant" is flagged unless the plan's profit interval is entirely above zero | `agent/report.py` (`overclaims`) |
-| The narrative still fails | It is discarded and the verified statements are shown instead | `agent/runtime.py` |
+| The model wrote "all approved" when nothing was approved, and a draft advised exporting without approval | While no plan of the run is approved or exported, a sentence saying that something was approved or exported, and advice to go ahead without approval, are flagged. A denial or a condition excuses a phrase only just before it, in the same clause. These are pattern lists; a paraphrase can pass | `agent/report.py` (`status_claims`, `bypass_advice`, `denied_before`); `agent/runtime.py` (`_loud`) |
+| The narrative still fails | In a run that made a plan it is discarded and the verified statements are shown instead; in a plain question the answer stays and is shown with a warning | `agent/runtime.py` |
+| A plan from an unfinished run could be approved without notice, and the export slider did not match the briefing | The CHECK block names the checklist steps not done and says not to approve before they are done (the Approve button is still shown); the export slider starts at the hold-out share designed in the run | `agent/check.py` (`check_items`, `designed_holdout_share`) |
 | Manipulative or invented copy | Drafts are checked by code: length, opt-out, brand named, no unlisted numbers, no pressure tactics, no sensitive attributes, no links; a pre-approved template is the fallback. The offer wording is checked first, and a message that fails the checks is never stored, so it cannot reach an export | `agent/copy_guard.py`, `agent/tools.py` (`_draft`) |
 | Wording changed after sign-off | Messages cannot be redrafted once the plan is approved: the approver has not seen the new wording, so a new plan and a new approval are required | `agent/tools.py` (`_draft`) |
 | Targeting by age or gender | No tool accepts a personal attribute; a campaign can be restricted only to the eight RFM segments, and an unknown or demographic segment name is refused with an error | `engine.py` (`plan`) |
@@ -238,7 +252,31 @@ Measured on 13 fixed requests (`liftpilot agent-eval`, section 10 of
 - median time for a full campaign plan: 136 s on an RTX 3080 laptop GPU.
 
 Thirteen requests written by the authors and one model is a small test. It shows that the
-controls held on these cases, not that the agent is safe in general.
+controls held on these cases, not that the agent is safe in general. This benchmark was run
+before the guards added after the stress test below and was not run again.
+
+Stress test built from the course's closing session, "Thinking Critically with AI"
+(`liftpilot agent-stress`, section 12 of [docs/RESULTS.md](docs/RESULTS.md), model `qwen3:8b`):
+9 of 9 gated cases passed over 17 agent runs, and 241 of 241 numbers in the answers were
+matched to a tool result or to a number in the request. This is one full run of all ten cases
+on the final code. The cases are: the same request three times, opposite opinions, a leading
+request, three known answers, two hidden instructions, and a swap of the sender's name and
+role. A language swap is reported and not counted: the French and the Arabic request each gave
+the English plan, the full checklist and an approval request, after one reminder from the
+runtime. Four earlier runs of the suite each scored 9 of 9 and each hid a problem that reading
+the answers or the code showed (in one of them the Arabic request stopped after three tools);
+a guard or a stricter rule was added after each. In the final run the guards rejected 1
+narrative, and it was a correct one: the over-claim list matched "messages sent" inside "No
+messages sent yet." The mapping of the session to the product, with gaps, is in
+[docs/CRITICAL_THINKING.md](docs/CRITICAL_THINKING.md).
+
+Before a person approves a plan, the dashboard shows a block "Before you approve: CHECK" with
+five lines written by code from that run's tool results (Claims, Hunt the source, Evidence and
+numbers, Cross-check, Keep a human sign-off). The Claims line says how many numbers the
+briefing states and how many were matched to a tool result or to a number in the request. If
+the run did not finish the checklist, the block names the steps not done. After approval, the
+slider "Random hold-out for measurement" starts at the share designed in the run (2% for the
+base request of the stress test), or at 10% if the run designed none.
 
 The sample brand in drafted messages, "FreshMart", is fictional.
 
@@ -302,13 +340,23 @@ Two live feeds have a job in the planner and never change the uplift scores: exc
   (-25,589 to 120,655). See [docs/ETHICS.md](docs/ETHICS.md), section 3.
 - The agent benchmark has 13 requests written by the authors and covers one model. A full plan
   took between 40 and 161 seconds in that run.
+- Requests in other languages were tested once each (French, Arabic), on one request. Both
+  matched the English plan in the final stress run, after an earlier run in which the Arabic
+  request stopped after three tools. The wording of the drafts was not compared.
+- The checks on the agent's wording are lists of patterns: a paraphrase that avoids the listed
+  words passes them, and the over-claim list also matches correct denials such as "No messages
+  sent yet." Export does not depend on wording; it needs a named approval.
 - Lifetime-value figures are capped at a 36-month horizon and rest on a three-month window.
 - One experiment, one retailer, one period. Nothing here is a guarantee of future results.
 
 ## Documentation
 
 - [docs/EXPLAINER.md](docs/EXPLAINER.md): the whole project from zero, in plain language
+- [docs/QUICKSTART.md](docs/QUICKSTART.md): how to start the dashboard and use each tab
 - [docs/RESULTS.md](docs/RESULTS.md): every number (generated)
+- [docs/CRITICAL_THINKING.md](docs/CRITICAL_THINKING.md): how the project applies the course's
+  closing session "Thinking Critically with AI" (three ways AI fails, CHECK, the ethics
+  compass, the stress tests), with the gap for each control
 - [docs/MODEL_CARD.md](docs/MODEL_CARD.md), [docs/DATASHEET.md](docs/DATASHEET.md), [docs/ETHICS.md](docs/ETHICS.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md)
 

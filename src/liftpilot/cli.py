@@ -1,4 +1,4 @@
-"""Command line: ``liftpilot download | train | report | results | agent | agent-eval | app``."""
+"""Command line: ``liftpilot download | train | report | results | agent | agent-eval | agent-stress | app``."""
 
 from __future__ import annotations
 
@@ -192,11 +192,19 @@ def agent(
 
 
 @app.command()
-def results(offline: bool = False) -> None:
+def results(
+    offline: bool = False,
+    sheet_only: bool = typer.Option(
+        False, help="only rewrite docs/RESULTS.md from the saved artifacts; compute nothing"
+    ),
+) -> None:
     """Run the extra analyses and regenerate docs/RESULTS.md and docs/figures/."""
     from liftpilot import figures
     from liftpilot import results as res
 
+    if sheet_only:
+        console.print(f"wrote {res.write_results_md()}")
+        return
     res.extra_analyses("x5", offline=offline)
     path = res.write_results_md()
     names = figures.make_all()
@@ -213,6 +221,39 @@ def agent_eval(dataset: str = "x5", offline: bool = False) -> None:
     res = run_benchmark(ag, config.root() / "artifacts" / "agent_eval.json")
     for r in res["runs"]:
         console.print(json.dumps(r, default=str), markup=False)
+    console.rule("summary")
+    console.print(json.dumps(res["summary"], indent=2), markup=False)
+
+
+@app.command(name="agent-stress")
+def agent_stress(
+    dataset: str = "x5",
+    offline: bool = False,
+    case: list[str] = typer.Option(  # noqa: B008
+        None, help="run only this case id (repeat the option for several)"
+    ),
+) -> None:
+    """Critical-thinking stress test of the agent; writes artifacts/agent_stress.json.
+
+    The file is rewritten after every case, so an interrupted run keeps the
+    cases that finished. Cases that are not run again keep their saved result.
+    """
+    from liftpilot.agent.runtime import build_agent
+    from liftpilot.agent.stress import CASE_IDS, run_stress
+
+    unknown = [c for c in case or [] if c not in CASE_IDS]
+    if unknown:
+        raise typer.BadParameter(f"unknown case {unknown}; known: {', '.join(CASE_IDS)}")
+    ag = build_agent(dataset, use_llm=True, offline=offline)
+    if ag.llm is None or not ag.llm.available():
+        raise typer.BadParameter("the local model is not running; this suite needs it")
+
+    def show_case(row: dict) -> None:
+        verdict = {True: "PASS", False: "FAIL", None: "REPORTED"}[row["passed"]]
+        line = f"{verdict}  {row['id']}  {row['seconds']:.0f}s  {'; '.join(row['reasons'])}"
+        console.print(line.encode("ascii", "replace").decode(), markup=False)
+
+    res = run_stress(ag, config.root() / "artifacts" / "agent_stress.json", case or None, show_case)
     console.rule("summary")
     console.print(json.dumps(res["summary"], indent=2), markup=False)
 

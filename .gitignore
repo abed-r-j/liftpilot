@@ -29,3 +29,6 @@ runs/
 Thumbs.db
 .vscode/
 .idea/
+
+# build scratch
+docs/_scratch/

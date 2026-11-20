@@ -13,7 +13,7 @@ Audience: computer-engineering students and a marketing-and-AI instructor. Engli
 
 **LiftPilot** is an AI campaign agent that spends marketing budget only where it changes customer
 behaviour. One-line pitch: *"Most marketing AI finds people who will buy. LiftPilot finds people
-who will buy BECAUSE you contacted them, proves it on a real experiment, and asks a human before
+who will buy BECAUSE you contacted them, tests it on a real experiment, and asks a human before
 anything is sent."*
 
 ## The story, in the order the evidence supports it
@@ -63,7 +63,7 @@ anything is sent."*
    as a negative result. An earlier version of the audit counted excluded minors inside the 18-24
    band and overstated the gap (0.85 / 0.70 / 0.48); a code review caught it. Say this if asked: it
    is a good example of why the audit itself needs review.
-   Agent benchmark (final code): see section 10 of RESULTS.md. A full plan takes about 50 seconds
+   Agent benchmark (run before the stress-test guards; not run again): see section 10 of RESULTS.md. A full plan takes about 50 seconds
    on a cool laptop and two minutes or more when the GPU is hot or shared (benchmark median 136 s).
 10. **External check.** On the Hillstrom e-mail test (64,000 customers, real spend in USD) the
     effect is nearly uniform across customers, uplift rankings are unstable, and the right answer
@@ -89,8 +89,8 @@ anything is sent."*
 - The brand in sample messages, "FreshMart", is fictional.
 - Lifetime value figures are capped at a 36-month horizon and rest on a three-month window.
 - References: use only entries marked `[verified: ...]` in the research files
-  (`C:\Users\abedr\AppData\Local\Temp\claude\9bd729568ee9ca7b\bf62ae74-a7fc-4e23-9e0e-7060b62a5983\scratchpad\research\01_literature.md`,
-  `...\03_ethics.md`, `...\02_data.md`). Copy citation data exactly. Do not cite anything else.
+  (the research notes `01_literature.md`, `02_data.md`, `03_ethics.md`, kept outside the
+  repository). Copy citation data exactly. Do not cite anything else.
   Radcliffe & Surry (2011) does NOT contain the four customer-type names; do not attribute them to it.
 - Plain, direct English. No hype words, no em dashes, no "revolutionary". Define a term once.
 - Honest limits belong in the text, not in a footnote.
@@ -101,7 +101,7 @@ Other groups cover: causal measurement of promotion effectiveness (PromoGuard), 
 prediction with RFM and profit-based recommendations, personalised retail marketing, customer
 intelligence dashboards, cold outreach, market intelligence, synthetic customer panels.
 LiftPilot differs on four points: (1) it decides who NOT to contact, per customer, with a
-calibrated profit rule; (2) every plan is proven by replay on a real randomised experiment with
+calibrated profit rule; (2) every plan is tested by replay on a real randomised experiment with
 intervals, before spending; (3) the agent is fenced: numbers only from tools, facts written by
 code, human approval gate, audit log, all measured in an agent benchmark; (4) it reports where it
 does not help (cheap contact, uniform effects, fair mode).

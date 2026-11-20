@@ -36,10 +36,24 @@ To stop: press **Ctrl+C** in the PowerShell window, then quit Ollama from its tr
 | ③ Uplift models | nothing, just read | the model comparison (Qini curves) |
 | ④ Optimizer | drag **Cost per message**, **Gross margin**, **Discount to buyers**; tick **Limit the budget**; switch **Fair mode** | who to contact, the spend, the real incremental profit and its interval; a yellow box if the fairness audit flags the plan |
 | ⑤ AI agent | pick a line under **Example requests** (or type a request), click **▶ Run agent**, wait one to three minutes | the briefing, the verified statements, the tool calls, one message per segment |
-| ⑤ AI agent, lower part | type a name in **Approver name (required)**, press Enter, click **✅ Approve plan**, then **⚡ Export audience file** | the audience file is written to `runs\<plan id>\` |
+| ⑤ AI agent, lower part | read the block **Before you approve: CHECK**, then type a name in **Approver name (required)**, press Enter, click **✅ Approve plan**, then **⚡ Export audience file** | first the CHECK block: five lines written by code from this run's tool results (Claims, Hunt the source, Evidence and numbers, Cross-check, Keep a human sign-off). After approval, a slider **Random hold-out for measurement** that starts at the share designed in the run. After export, the audience file is written to `runs\<plan id>\` |
 | ⑥ Ethics & audit | nothing, just read | the age and gender audit of the plan set in tab ④, the controls, the audit log |
 
 Things to know:
+
+- The CHECK block sits above the approver name field while the plan is not yet approved. It
+  shows how many numbers the briefing states and how many were matched to a tool result or to
+  a number in the request, the tool calls and whether their results are in the audit log, the
+  replay profit with its 95% interval, the model's expectation beside the replay with the
+  fairness ratios against the 0.80 line, and that nothing is exported until a named person
+  approves. It adds no button and no extra click. It is there to be read.
+- If the block says "Steps not done in this run", the agent did not finish the checklist for
+  that plan. Do not approve it. Run the request again. The Approve button is still shown, so
+  this is your decision, not something the screen stops.
+- After approval, the slider **Random hold-out for measurement** starts at the share designed
+  in the run, the same share the verified statements give, and a caption under it says so. If
+  the run designed no hold-out it starts at 10%. Move it only if you mean to export a share
+  different from the one in the briefing.
 
 - After you click **▶ Run agent**, do not touch any slider, switch or selector until the answer
   is on screen. Clicking a tab title is safe.

@@ -34,7 +34,7 @@ from liftpilot.agent.grounding import (
     stated_amounts,
 )
 from liftpilot.agent.llm import LLMUnavailable, OllamaClient
-from liftpilot.agent.report import overclaims, verified_statements
+from liftpilot.agent.report import bypass_advice, overclaims, status_claims, verified_statements
 from liftpilot.agent.tools import Toolbox
 
 SYSTEM_PROMPT = """You are LiftPilot, a campaign-planning agent for a retailer's marketing manager.
@@ -106,6 +106,10 @@ class AgentRun:
     statements: list[str] = field(default_factory=list)
     overclaims: list[str] = field(default_factory=list)
     rejected_narrative: str | None = None
+    # what the runtime had to do itself, kept so that a test run can show which guard fired
+    nudges: int = 0
+    forced_steps: list[str] = field(default_factory=list)
+    first_draft_problems: list[str] = field(default_factory=list)
 
     def tool_results(self) -> list[Any]:
         return [s.result for s in self.steps]
@@ -213,6 +217,46 @@ class Agent:
             kept.pop("budget_currency", None)
         return kept, dropped, problem
 
+    @staticmethod
+    def _holdout_provenance(
+        args: dict[str, Any], said: str
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        """Keep a detection target for the hold-out only if the manager stated it.
+
+        The stress test showed the model filling ``minimum_detectable_uplift``
+        with a value of its own (the example from the tool description, or a
+        figure it picked), and not the same one each time: the same request
+        gave hold-outs of different sizes. Same rule as for money assumptions:
+        a value the manager did not write is dropped and the system default
+        (the mean expected uplift of the selected customers) applies.
+
+        "Stated" is strict here. The value must be a fraction between 0 and 1,
+        and the manager must have written it next to detection wording ("detect
+        an uplift of 2%", "a 2% uplift"). A number written for something else,
+        such as the 6 of "6 RUB" or the 25 of "margin 25%", does not count.
+        The wording is matched in English only: a target stated in another
+        language is dropped and the default applies.
+        """
+        key = "minimum_detectable_uplift"
+        if key not in args:
+            return args, {}
+        try:
+            v = float(args[key])
+        except (TypeError, ValueError):
+            v = float("nan")
+        ok = False
+        if 0 < v < 1:
+            unit = r"\s*(?:%|per ?cent|percent(?:age)? points?|points?|pp\b)"
+            forms = [re.escape(f"{v * 100:.6g}") + unit, re.escape(f"{v:.6g}") + r"(?![\d%])"]
+            for num in (r"(?<![\d.,])" + f for f in forms):
+                if re.search(
+                    r"(?:detect|uplift|lift|effect)[^.;\n]{0,40}?" + num, said, re.I
+                ) or re.search(num + r"\s+(?:of\s+)?(?:uplift|lift|effect)", said, re.I):
+                    ok = True
+        if ok:
+            return args, {}
+        return {k: a for k, a in args.items() if k != key}, {key: args[key]}
+
     def _execute(self, run: AgentRun, name: str, args: dict[str, Any]) -> Any:
         start = time.perf_counter()
         dropped: dict[str, Any] = {}
@@ -221,6 +265,8 @@ class Agent:
             args, dropped, problem = self._provenance(
                 args, run.said or run.request, self.toolbox.engine.currency
             )
+        elif name == "design_holdout" and run.mode == "llm":
+            args, dropped = self._holdout_provenance(args, run.said or run.request)
         result = {"error": problem} if problem else self.toolbox.call(name, args)
         if dropped and isinstance(result, dict) and not problem:
             result["ignored_arguments"] = {
@@ -258,7 +304,13 @@ class Agent:
         """Checklist enforced by the runtime, not left to the model's goodwill.
 
         Any plan the agent creates must come with evidence and a fairness audit.
-        A campaign request must also reach the human-approval step.
+        A campaign run must also reach the human-approval step.
+
+        A run is a campaign run when the model itself called ``plan_campaign``
+        and got a plan, whatever language the request is in. The stress test
+        showed why the request's words are not enough: the same request in
+        Arabic contains none of the English keywords, so the run stopped after
+        the fairness audit. The keywords stay as a second trigger.
         """
         if not run.plan_ids:
             return None, []
@@ -269,9 +321,18 @@ class Agent:
             if not (isinstance(s.result, dict) and "error" in s.result)
             and (s.args.get("plan_id") == pid or s.tool == "schedule_campaign")
         }
+        planned = any(
+            s.tool == "plan_campaign"
+            and isinstance(s.result, dict)
+            and "error" not in s.result
+            and s.result.get("plan_id") == pid
+            for s in run.steps
+        )
         text = run.request.lower()
-        wants_campaign = any(w in text for w in CAMPAIGN_WORDS) or bool(
-            done & {"draft_messages", "request_approval", "design_holdout"}
+        wants_campaign = (
+            planned
+            or any(w in text for w in CAMPAIGN_WORDS)
+            or bool(done & {"draft_messages", "request_approval", "design_holdout"})
         )
         required = CAMPAIGN_STEPS if wants_campaign else EVIDENCE_STEPS
         return pid, [s for s in required if s not in done]
@@ -304,12 +365,42 @@ class Agent:
             },
         ]
 
+    def _loud(self, answer: str, run: AgentRun, pid: str | None) -> list[str]:
+        """Wording the evidence does not support: over-confident words, sentences
+        saying a plan was approved or exported when neither happened, and advice
+        to go ahead without approval.
+
+        "Happened" is judged for the plans of this run only (the ones it made
+        or named in a tool call). An approval given to another plan earlier in
+        the same session does not make the sentence true for this one.
+        """
+        found = overclaims(answer, run.steps, pid)
+        engine = self.toolbox.engine
+        mine = {
+            *run.plan_ids,
+            *(s.args.get("plan_id") for s in run.steps if isinstance(s.args, dict)),
+        }
+        happened = any(
+            s.tool == "export_audience"
+            and isinstance(s.result, dict)
+            and s.result.get("status") == "exported"
+            for s in run.steps
+        ) or any(
+            engine.approval_status(p) == "approved"
+            for p in mine
+            if isinstance(p, str) and p in engine.plans
+        )
+        if not happened:
+            found += [f'"{s}" (nothing was approved or exported)' for s in status_claims(answer)]
+            found += [f'"{s}" (approval cannot be skipped)' for s in bypass_advice(answer)]
+        return found
+
     def _finish(self, run: AgentRun, started: float) -> AgentRun:
         sources: list[Any] = [*run.tool_results(), run.request]
         pid = run.plan_ids[-1] if run.plan_ids else None
         if not run.statements:
             run.statements = verified_statements(run.steps, pid)
-        run.overclaims = overclaims(run.answer, run.steps, pid) if run.mode == "llm" else []
+        run.overclaims = self._loud(run.answer, run, pid) if run.mode == "llm" else []
         run.grounding = check_grounding(run.answer, sources)
         run.seconds = round(time.perf_counter() - started, 2)
         self.audit.write(
@@ -375,6 +466,7 @@ class Agent:
                     pid, missing = self._missing_steps(run)
                     if missing and nudges < 2:
                         nudges += 1
+                        run.nudges = nudges
                         messages.append(
                             {
                                 "role": "user",
@@ -387,6 +479,7 @@ class Agent:
                         continue
                     if missing and pid:
                         # the model would not comply: the runtime completes the checklist itself
+                        run.forced_steps = list(missing)
                         for name in missing:
                             result = self._execute(
                                 run, name, {"plan_id": pid} if name != "schedule_campaign" else {}
@@ -426,7 +519,7 @@ class Agent:
             sources = [*run.tool_results(), request]
             check = check_grounding(run.answer, sources)
             pid = run.plan_ids[-1] if run.plan_ids else None
-            loud = overclaims(run.answer, run.steps, pid)
+            loud = self._loud(run.answer, run, pid)
             if run.answer and (not check.ok or loud):
                 problems = []
                 if not check.ok:
@@ -436,9 +529,13 @@ class Agent:
                     )
                 if loud:
                     problems.append(
-                        "these words claim more certainty than the evidence gives: "
-                        + ", ".join(loud)
+                        "this wording claims more certainty than the evidence gives, or says "
+                        "that something happened which did not: " + ", ".join(loud)
                     )
+                run.first_draft_problems = [
+                    *(f"number not in any tool result: {n}" for n in check.ungrounded),
+                    *loud,
+                ]
                 base = self._narration_prompt(run) if run.statements else messages
                 msg = self.llm.chat(
                     [
@@ -456,10 +553,10 @@ class Agent:
                 )
                 fixed = str(msg.get("content", "")).strip()
                 better = len(check_grounding(fixed, sources).ungrounded) <= len(check.ungrounded)
-                if fixed and better and len(overclaims(fixed, run.steps, pid)) <= len(loud):
+                if fixed and better and len(self._loud(fixed, run, pid)) <= len(loud):
                     run.answer = fixed
-                still_bad = not check_grounding(run.answer, sources).ok or overclaims(
-                    run.answer, run.steps, pid
+                still_bad = not check_grounding(run.answer, sources).ok or self._loud(
+                    run.answer, run, pid
                 )
                 if still_bad and run.statements:
                     # last line of defence: the narrative is discarded, the facts stand

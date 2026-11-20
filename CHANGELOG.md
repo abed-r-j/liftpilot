@@ -7,6 +7,98 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+Work done after the course published its closing session, "Thinking Critically with AI". No
+version number was changed.
+
+### Added
+
+- **Stress suite.** `liftpilot agent-stress` runs 10 cases built from the closing session (the
+  same request three times, opposite opinions, a leading request, three known answers, two
+  hidden instructions, a swap of sender name and role, a swap of language) and writes
+  `artifacts/agent_stress.json`; `--case <id>` runs one case. Results in section 12 of
+  `docs/RESULTS.md`, from one full run of all ten cases on the final code: 9 of 9 gated cases
+  passed over 17 agent runs, 241 of 241 numbers matched to a tool result or to a number in the
+  request, 1 narrative rejected by the guards. The language swap is reported and not gated;
+  the French and the Arabic request each matched the English plan and completed the checklist.
+- **Guards found by the stress suite.** The runtime ignores a hold-out detection target the
+  manager did not state; wording that says something was approved or exported is rejected while
+  nothing is; advice to go ahead without approval is rejected; a run the model does not finish
+  cannot pass a stress case. The two wording checks are pattern lists: a paraphrase that avoids
+  the listed words passes them. Export itself does not depend on wording.
+- **Checklist in any language.** A run in which the model itself made a plan must complete the
+  whole campaign checklist, whatever the language of the request. English keywords are only a
+  second trigger.
+- **CHECK block.** The dashboard shows "Before you approve: CHECK" above the approver name
+  field: five lines (Claims, Hunt the source, Evidence and numbers, Cross-check, Keep a human
+  sign-off) written by code from the run's tool results. It adds no click. When a run made a
+  plan but did not finish the checklist, the block names the steps not done and says not to
+  approve before they are done.
+- **Stress suite bookkeeping.** Every saved case carries a fingerprint of the code that
+  produced it; the result file is written whole and a broken file stops the run; an empty
+  answer or a step-limit answer fails a case; the agent run records the reminders it got, the
+  steps the runtime ran itself and what was matched in its first draft. Section 12 of the
+  results sheet lists the earlier runs, the guards that acted and the guards that did not.
+- **Critical-thinking mapping.** `docs/CRITICAL_THINKING.md` maps the closing session to the
+  product, control by control, with the evidence and the gap for each, and lists how the
+  session's eight references were checked.
+- **Results sheet.** `liftpilot results --sheet-only` rewrites `docs/RESULTS.md` from the saved
+  artifacts without recomputing or refetching anything.
+- **Quick-start guide.** `docs/QUICKSTART.md`: how to start the dashboard and what to do in
+  each tab.
+- **Fallback screenshots.** Six screenshots of the dashboard in `docs/presentation/fallback/`,
+  for a presentation without a working demo.
+
+### Fixed
+
+- **Approval.** A new approval request no longer resets a plan that a person already approved
+  (found by a review after the last stress run; `engine.py`, unit test only).
+- **CHECK block.** It counts only the steps of the last plan of a run, and an interval of
+  missing values is no longer read as an interval.
+- **Dark theme.** Dashboard colours are readable in the dark theme.
+- **Tab titles.** Tab titles are no longer clipped.
+- **Arabic request stopped early.** In an earlier stress run an Arabic request got a plan but
+  no hold-out design, no send date, no drafts and no approval request, because the runtime
+  recognised a campaign request by English keywords. See "Checklist in any language" above.
+- **"Approved" check switched off after any approval.** The check on false "approved or
+  exported" wording, and the check on advice to skip approval, now look only at the plans of
+  the run itself. An approval given to another plan earlier in the session no longer excuses
+  the wording. Once a plan of the run really is approved, neither check is applied to that run.
+- **A denial anywhere excused the whole sentence.** A denial or a condition now excuses a
+  status phrase only when it stands just before it, in the same clause. More phrasings count
+  as a claim ("export is complete", "approval has been granted").
+- **Hold-out guard was too loose.** A detection target is kept only if it is a fraction
+  between 0 and 1 that the manager wrote next to detection wording. A number written for
+  something else, such as a cost or a margin, no longer counts. The wording is matched in
+  English only.
+- **Export slider.** The slider "Random hold-out for measurement" started at 10% while the
+  briefing stated the designed share. It now starts at the share designed in the run, else at
+  10%, with a caption that says which.
+- **CHECK block.** The Claims line now says "matched to a tool result or to a number in the
+  request", which is what the check does. Malformed values in a run give a plain row and no
+  error on the approval screen.
+- **Stress scoring.** The hidden-instruction cases could pass with an empty answer. The French
+  test sentence began with "Planifie", which contains the English keyword "plan"; it was
+  replaced by a sentence with no English keyword, and a test checks this. The checks for
+  agreement and for a guaranteed result read only the words around the phrase.
+
+### Known limitations
+
+- Four earlier runs of the stress suite each scored 9 of 9 under a weaker rule and each hid a
+  problem (section 12 of `docs/RESULTS.md`). The final figures come from one run of all ten
+  cases on the final code: one model, one seed, one run per variant.
+- The over-claim list does not read denials. In the final stress run it matched "messages
+  sent" inside "No messages sent yet.", and one correct briefing was replaced by the verified
+  statements. The first draft was sent back for a rewrite in 16 of 17 runs. Not fixed.
+- Some guards did not have to act in the final stress run, so only unit tests show that they
+  work: dropping an invented planning argument, the runtime running missing steps itself,
+  blocking an export attempt, and sending a draft back for an ungrounded number or for advice
+  to skip approval.
+- The dashboard still shows the Approve button for a plan whose run did not finish the
+  checklist. The CHECK block warns; it does not stop.
+- Languages other than English were tested with one French and one Arabic request, one run
+  each. The wording of the drafts was not compared.
+- The agent benchmark of section 10 was produced before these guards and was not run again.
+
 ## [1.0.0] - 2026-11-25
 
 First release, prepared for the course presentation at Saint Joseph University of Beirut on

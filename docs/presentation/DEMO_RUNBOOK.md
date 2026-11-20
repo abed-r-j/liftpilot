@@ -28,6 +28,23 @@ app in a browser, and anything that needs the language model. Those points are m
 in rehearsal". Rehearse the whole path at least twice, once on a cool machine and once right
 after another agent run.
 
+Added after the course's closing session ("Thinking Critically with AI"): tab ⑤ now shows a
+block **Before you approve: CHECK** above the approver name (section 4 describes it). An
+earlier version of it was checked in a headless browser, in the dark and the light theme,
+with the scripted planner only. After the last code changes (the Claims row wording, the
+missing-steps lines, the hold-out slider that starts at the designed share) the block and the
+slider were checked only in-process, with Streamlit's own test harness and no browser: five
+rows, no error, and the slider at 0.02 after approval. A language-model run uses the same
+code, but that was not checked in a browser: confirm it in rehearsal. The runtime also has
+new guards from the stress test (`docs/RESULTS.md`, section 12). The benchmark in section 10
+was not run again after them, so its timings and counts describe the earlier runtime.
+
+**Restart the app before the talk.** A LiftPilot app that was started before the last code
+changes keeps the old code in memory and shows a red `ImportError` (`cannot import name
+'designed_holdout_share'`) instead of the page. Reloading the browser does not fix it. Stop
+that app with Ctrl+C in its PowerShell window and start it again (30 minutes before the
+talk, step 4). A fresh start also clears every plan and approval left from a rehearsal.
+
 ## 1. Speed pre-flight (do this first; it decides how long the agent takes)
 
 The language model shares the laptop GPU with everything else on screen. The same request that
@@ -82,7 +99,7 @@ says: set tab ④ and click **Run scripted planner (no language model)**.
 | 1 | Speed pre-flight, steps 1 to 4 | section 1: close GPU-hungry apps, charger, fan boost, GPU free | Task Manager: GPU memory mostly free |
 | 2 | Start Ollama | open the **Ollama** app from the Start menu (tray icon appears). If it is not installed as an app, run `ollama serve` in a second PowerShell window and leave it open | `ollama list` answers without an error |
 | 3 | Load the model | `ollama run qwen3:8b "Reply with the single word: ready" --keepalive 30m`, then `ollama ps` | the word `ready`; `qwen3:8b` listed on the GPU |
-| 4 | Start the app | `.\.venv\Scripts\liftpilot.exe app` (same as `.\.venv\Scripts\python.exe -m liftpilot.cli app`) | the browser opens `http://localhost:8501`; leave this PowerShell window open |
+| 4 | **Restart** the app | if an app from a rehearsal or from an earlier day is still running, stop it first: Ctrl+C in its PowerShell window, and close its browser tabs. Then `.\.venv\Scripts\python.exe -m liftpilot.cli app` (same as `.\.venv\Scripts\liftpilot.exe app`, if Windows does not block that file) | the browser opens `http://localhost:8501` with no red error; leave this PowerShell window open. An app left running from before a code change shows `ImportError` until it is restarted |
 | 5 | Wait for the first load | the page shows *Loading customers and models...* | six tabs appear: ① Problem, ② Customers (RFM), ③ Uplift models, ④ Optimizer, ⑤ AI agent, ⑥ Ethics & audit |
 | 6 | Read the sidebar | two pills | `LIVE` (or `CACHED`) followed by `1 RUB = ... USD`; `Local model: qwen3:8b` in green. If it says `Local model offline: scripted planner`, go back to step 2 |
 | 7 | **Decide on the Wi-Fi now** | if the room Wi-Fi is slow or needs a login page, switch on **Offline mode (use cached live data)** in the sidebar | the pill changes to `CACHED`; nothing else changes |
@@ -138,20 +155,69 @@ Times are cumulative from the moment the browser is on screen.
 
 | Clock | Where | Click | Say |
 |---|---|---|---|
-| 0:00 | Alt+Tab to the browser, tab **① Problem** | click the tab title; point at the four tiles (**Customers**, **Bought WITHOUT a message**, **Bought WITH a message**, **Real effect of the message**) | "This is the same system, on this laptop, on the real data. The experiment you saw: 60 percent bought with no message, 64 percent with one. The real effect is 3.3 points." |
+| 0:00 | Alt+Tab to the browser, tab **① Problem** | click the tab title; point at the four tiles (**Customers**, **Bought WITHOUT a message**, **Bought WITH a message**, **Real effect of the message**) | "The same system, on this laptop, on real data. The experiment you saw: 60 percent bought with no message, 64 percent with one. The real effect is 3.3 points." |
 | 0:15 | tab **② Customers (RFM)** | click the tab; point at the left of the bar chart | "The RFM segments, computed from the receipts, with the uplift measured in each. Champions, on the left, react least." |
 | 0:30 | tab **③ Uplift models** | click the tab; point at the red line. Do not scroll | "The model comparison. Red is the likely-buyer model, below the random line." |
-| 0:40 | tab **④ Optimizer** | click the tab. Do **not** move the slider. Point at the tile **Contact**, then the bar chart. Under the **Fair mode** switch there is no yellow box: point at that empty space | "The optimizer, set to 6 roubles a message. The plan contacts about 19 percent of the audience. At 2 roubles it was about 70 percent. The bar chart shows that contacting everyone would lose money. And no fairness warning here: at 6 roubles the audit passes." |
-| 1:05 | tab **⑤ AI agent** | click the tab. If the spinner still turns, say the waiting script and click nothing. When the answer is there, point at the pills *tool calls* and *numeric grounding* | "The agent has finished the job I gave it. It made these tool calls, and this is the grounding score: every number in its text was checked against a tool result." |
+| 0:40 | tab **④ Optimizer** | click the tab. Do **not** move the slider. Point at the tile **Contact**, then the bar chart. Under the **Fair mode** switch there is no yellow box: point at that empty space | "The optimizer, set to 6 roubles a message. The plan contacts about 19 percent of the audience. At 2 roubles it was about 70 percent. The bar chart shows that contacting everyone would lose money. No fairness warning: at 6 roubles the audit passes." |
+| 1:05 | tab **⑤ AI agent** | click the tab. If the spinner still turns, say the waiting script and click nothing. When the answer is there, point at the pills *tool calls* and *numeric grounding* | "The agent has finished. These are its tool calls, and this is the grounding score: every number in its text was checked against a tool result." |
 | 1:20 | **Agent's briefing** (left column) and **Verified statements (written by code from tool results)** (right column) | point left, then right | "On the left, the briefing in plain English. On the right, the verified statements, written by code. The model only narrates them." |
 | 1:35 | scroll past **What the agent did** to **Personalised messages (one per RFM segment)** | point at the column *Passed checks* | "One message per RFM segment, each checked by code. FreshMart is a fictional brand." |
-| 1:45 | scroll to **Human checkpoint** | click in **Approver name (required)**, type your name, press Enter (the buttons stay grey until then), click **✅ Approve plan** | "Nothing has been sent. The export is locked until a named human approves. I approve." |
-| 2:00 | same place, after the page refreshes | leave the slider **Random hold-out for measurement** at 0.10, click **⚡ Export audience file**, point at the green message | "Only now does the audience file exist, with a random ten percent hold-out to measure the next campaign." |
+| 1:45 | scroll to **Human checkpoint** | point at the block **Before you approve: CHECK**, just above the name field, while you say the first two sentences. Then click in **Approver name (required)**, type your name, press Enter (the buttons stay grey until then), click **✅ Approve plan** | "Nothing has been sent. First, CHECK from our closing session, filled in by code. The export is locked until a named human approves. I approve." |
+| 2:00 | same place, after the page refreshes | do **not** move the slider **Random hold-out for measurement**. It no longer starts at 0.10: it starts at the share designed in this run, and the caption under it reads "Starts at ...%: the share designed in this run (see the verified statements)." Point at the slider. If you name the share, read it from the screen; never say "ten percent". Click **⚡ Export audience file**, point at the green message | "Only now does the audience file exist, with the random hold-out shown here, to measure the next campaign." |
 | 2:10 | tab **⑥ Ethics & audit** | click the tab; point at the chart on the right (*Share contacted by age band*) and the green *OK* pill under it, then scroll to **Audit log (latest events)** | "Last tab. The age audit of the 6-rouble plan, marked OK, then the list of controls, and the audit log. My approval was just recorded, with my name." |
 | 2:30 | Alt+Tab back to PowerPoint, slide 15 | | "So the system works, and it audits its own fairness. Let us look at that audit properly." |
 
 The plan has 0:45 of reserve (2:30 used out of 3:15). It is there for the waiting script. If
 the answer was ready at 1:05, use the reserve to speak more slowly, not to add steps.
+
+Word budget. The narration is still 243 spoken words in 2:30, counted by `build_deck.py` the
+way the script counts them. The CHECK sentence at 1:45 added 10 words. The same 10 were cut
+from three other lines: 3 at 0:00, 2 at 0:40 and 5 at 1:05. No time slot changed. The 1:45
+step is now the tightest one: 25 words plus typing a name in 15 seconds. Say the CHECK
+sentence while you point, before you touch the keyboard. If it runs over, the reserve covers
+it. Time this step in rehearsal. The line at 2:00 was reworded when the slider changed: it
+no longer names a percentage. It was 19 spoken words and is still 19, so the total stays 243.
+
+The hold-out share at 2:00. For the request "A message costs 6 RUB, margin 25%" without a
+budget, the run designs a hold-out of 2% of the selected customers (762 customers, able to
+detect an uplift of 6.7%; `docs/RESULTS.md`, section 12), and the in-process check showed
+the slider at 0.02 with the caption "Starts at 2%: the share designed in this run". The demo
+request also names a budget in reais and was not run after the change, so its share is not
+confirmed: read it in rehearsal, and check that the slider, its caption and the sentence
+"Measurement: keep a random ...%" in the verified statements show the same share. If a run
+designed no hold-out, the slider starts at 0.10 and the caption says "the default, because
+this run designed no hold-out."
+
+The block **Before you approve: CHECK** (tab ⑤, under **Human checkpoint**, between the
+line "Plan ...: contact ... customers, expected spend ... Status: ..." and the field
+**Approver name (required)**). It has five rows, one per letter, in the words of the closing
+session. Code writes every row from the tool results of this run. No sentence in it comes
+from the language model. It adds no click.
+
+| Letter | Row title | What the row says |
+|---|---|---|
+| C | Claims | "The briefing states ... numbers; ... were matched to a tool result or to a number in the request." If a number was not matched, the row lists it after "Not matched, do not rely on them" |
+| H | Hunt the source | "... tool calls (the tool names). ... of ... result hashes are in the audit log. Each result can be opened under 'What the agent did'." If the run left checklist steps undone, the row ends with "Steps not done in this run: ..." |
+| E | Evidence and numbers | "Experiment replay: ... incremental profit, 95% interval ... to ...; the interval includes zero, so a loss is possible." Then "Caveat: ...", if the replay tool returned one. With no replay in the run the row says so |
+| C | Cross-check | "Model expects ...; the experiment replay shows ...." Then "Fairness ratios against the 0.80 line: gender ..., age band ...; none is under the line." |
+| K | Keep a human sign-off | "Nothing is exported until a named person approves. The approval and the name are written to the audit log." If steps are missing, the row starts with "Steps not done in this run: ...; do not approve before they are done." If you see that on stage, do not approve: use the backup tab (fallback A) |
+
+The two lines about missing steps were not seen in any language-model run; a unit test
+covers them. In the in-process check of a full run the Claims row read "31 numbers; 31 were
+matched to a tool result or to a number in the request" and the Hunt row "8 of 8 result
+hashes are in the audit log". In the live run with the language model that produced the
+fallback screenshots (the demo request, 64 seconds) the rows read "15 numbers; 15 were matched"
+and "7 of 7 result hashes", and the export slider started at 0.02. Your numbers on the day
+can differ: read them from the screen.
+
+For the demo request, expect in the Evidence row the replay profit of 99,838 RUB with the
+interval −99,289 to 296,175 RUB (the agent's own figures, `docs/RESULTS.md`, section 7), and
+in the Cross-check row the ratios gender 0.95 and age band 0.82. Read the other values from
+the screen. The block is shown only while the plan waits for a decision. After **✅ Approve
+plan** the page refreshes and the block is replaced by the hold-out slider and the export
+button, so point at it before you approve. If someone asks what it is: it is the CHECK method
+from the closing session, applied to this one run, so that the approver sees the claims, the
+sources and the evidence before signing. It does not check that the approver read it.
 
 What you should see on tab ④ at 6 RUB (recomputed with the app's own calls; the same figures
 are in `docs/RESULTS.md`, section 6):
@@ -223,7 +289,7 @@ seconds. That covers every campaign plan in the benchmark, including the hot-mac
 | A | The spinner on tab ⑤ is still turning after the waiting script, or the answer is an error line | press **Ctrl+Tab** to the backup tab (pre-flight step 9). It shows the same request, finished. Continue the click path from 1:05 in that tab, including approval and export. Do not click **Run scripted planner (no language model)** in the live tab while the spinner turns: the click is only handled when the running model call returns | "The live run is slow today. This is the same request, run on this laptop before the talk." |
 | B | The sidebar pill says **Local model offline: scripted planner** (Ollama is not running), or after **▶ Run agent** the briefing says *"The local language model is not running, so the costs or budget written in this request cannot be read. No plan was made. ..."* | before the talk: start Ollama (pre-flight steps 2 and 3) and reload. On stage, or if that fails: check that tab ④ is on 6.0 and margin 0.25, then on tab ⑤ click **Run scripted planner (no language model)**. It runs the same tools in a fixed order with the cost, margin and discount set in tab ④, and in about 3 seconds gives the same verified statements, the drafts (from pre-approved templates when the model is off) and the approval request. Then continue the click path from 1:05: approval and export work the same. The first pill reads *scripted planner* instead of *language model*. The scripted planner does not read the BRL budget from the text; that changes nothing here, because at 6 RUB the plan needs far less than the budget. Do **not** click **▶ Run agent** in this state: the demo request names a cost and a budget, so the agent refuses to plan | "The language model is not available, so I use the scripted planner. Same tools, same order, same checks, and the same verified statements. Without the model the system refuses to guess the costs in my sentence, so I set them with the sliders." |
 | C | Sidebar pill says **FX unavailable**, or the plan step of the agent shows an error about the exchange rate (Wi-Fi) | this must be fixed before the agent is started: switch on **Offline mode (use cached live data)** in the sidebar. If it happens on stage, use the backup tab (A) | "The Wi-Fi is down, so I show the run made before the talk. The feeds are cached for exactly this reason: live data must never be able to break the plan." |
-| D | A yellow warning says *The model's wording failed a check, so it was discarded. The verified statements are shown instead.* | nothing to fix. This is a control working. In the benchmark it happened in 1 of 13 runs | "The model's wording failed a check, so the system discarded it and shows the verified statements. You are watching a guardrail fire." |
+| D | A yellow warning says *The model's wording failed a check, so it was discarded. The verified statements are shown instead.* | nothing to fix. This is a control working. In the benchmark it happened in 1 of 13 runs. Since the stress test the same warning also appears when the wording says something was approved or exported before it was, or advises going ahead without approval. It can also fire on a correct sentence: in the final stress run it happened in 1 of 17 runs, because the over-claim list matched "messages sent" inside "No messages sent yet." If asked, say so | "The model's wording failed a check, so the system discarded it and shows the verified statements. You are watching a guardrail fire." |
 | E | The first pill of the answer reads *scripted planner* although you clicked **▶ Run agent**, and the first verified statement says "2 RUB per message" | the model stopped answering before the first tool call, so the run fell back to the scripted planner with default costs. Do not approve that plan. Use the backup tab (A), or click **Run scripted planner (no language model)**, which uses the 6.0 set in tab ④ | "The model dropped out, so this plan used default costs. Let me show the run with the right cost." |
 | F | The page shows a red Streamlit error, or the browser tab is blank | do not reload. Press **Ctrl+Tab** to the backup tab and continue there (A) | "Let me switch to the second window." |
 | G | The app does not come back, or the laptop freezes | Alt+Tab to the folder `docs\presentation\fallback\` and step through the six screenshots with the arrow keys, saying the same lines as the click path | "I will show you the same run recorded earlier on this machine." |
@@ -257,6 +323,8 @@ Save as PNG in `docs\presentation\fallback\`, named so that they sort in order:
 3. `3_optimizer_6rub.png`: tab ④ with the cost at 6.0, the Fair mode switch, the five tiles and no fairness warning.
 4. `4_agent_answer.png`: tab ⑤ after the run: pills, **Agent's briefing** and **Verified statements**.
 5. `5_checkpoint_export.png`: tab ⑤ lower part: messages table, approval and the green export message.
+   Take one more before you approve, `5a_check_block.png`: the block **Before you approve: CHECK**
+   with the empty name field under it. After approval the block is no longer on the page.
 6. `6_ethics_audit.png`: tab ⑥ with the age chart, its *OK* pill and the audit log showing the approval.
 
 ## 7. After the talk
@@ -281,5 +349,20 @@ fan boost off. The exported audience file (`runs\<plan id>\`) and the audit log
   the agent's verified statements (−99,289 to 296,175): it is the same plan and the same
   estimate, 99,838 RUB. Both are bootstrap intervals computed with a different number of
   random draws, and both are on the results sheet (sections 6 and 7).
+- Do not say the stress test proves the agent is safe. Say what was run: 9 of 9 gated cases
+  pass in one full run of all ten cases on the final code (17 agent runs, 241 of 241 numbers
+  matched to a tool result or to a number in the request). Four earlier runs each exposed a
+  weakness that now has a guard. One briefing was discarded although it was correct, because
+  the over-claim list matched "messages sent" inside "No messages sent yet."
+  (`docs/RESULTS.md`, section 12).
+- Do not type the demo request in French or in Arabic on stage. In the final stress run both
+  gave the same plan, the same decision numbers, a full checklist and an approval request,
+  but that is one run per language, reported and not gated, and neither was rehearsed in the
+  browser. In an earlier run the Arabic request stopped after 3 tools; say so if asked.
+- Do not say "ten percent" for the hold-out, and do not quote a hold-out size from an agent
+  run made before the stress test. The model used to choose the detection target itself and
+  got 8% or 16%. The runtime now ignores a target the manager did not state, and the stress
+  runs all state 2% of the selected customers (762). The slider **Random hold-out for
+  measurement** starts at the share designed in the run. Read the share from the screen.
 - Do not say the agent run takes "a few seconds". It takes about 50 seconds on a cool machine
   and the measured median is 136 seconds. Only the scripted planner takes a few seconds.

@@ -7,6 +7,7 @@ randomised campaign data; the local language model only orchestrates and writes.
 
 from __future__ import annotations
 
+import html
 import json
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from liftpilot import config, live
+from liftpilot.agent.check import designed_holdout_share, safe_check_items
 from liftpilot.agent.copy_guard import PRESSURE_PATTERNS, Offer
 from liftpilot.agent.llm import OllamaClient
 from liftpilot.agent.runtime import Agent, AuditLog
@@ -58,6 +60,13 @@ st.markdown(
     .note {opacity:.72; font-size:.86rem;}
     .formula {background:rgba(128,128,128,.12); border-left:4px solid #2563eb; padding:10px 14px;
         border-radius:6px; font-family:ui-monospace,Consolas,monospace; font-size:.9rem;}
+    .check {background:rgba(128,128,128,.10); border:1px solid rgba(128,128,128,.28);
+        border-radius:12px; padding:10px 16px; margin:.3rem 0 .9rem 0; font-size:.92rem;}
+    .check .head {font-weight:700; margin-bottom:.35rem;}
+    .check .row {display:flex; gap:.6rem; padding:.16rem 0; line-height:1.35;}
+    .check .letter {flex:0 0 1.5rem; height:1.5rem; border:1px solid rgba(128,128,128,.55);
+        border-radius:6px; text-align:center; font-weight:700; line-height:1.4rem;}
+    .check .what {font-weight:600;}
     </style>
     """,
     unsafe_allow_html=True,
@@ -798,7 +807,7 @@ with tabs[4]:
                     "Numbers not found in any tool result (do not rely on them): "
                     + ", ".join(g.ungrounded[:10])
                 )
-            if run.overclaims:
+            if run.overclaims and not run.rejected_narrative:
                 st.warning("Over-confident wording detected: " + ", ".join(run.overclaims))
         with right_a:
             st.markdown("#### Verified statements (written by code from tool results)")
@@ -856,6 +865,24 @@ with tabs[4]:
                 f"expected spend **{money(sp.summary['expected_spend'], cur)}**. Status: **{status}**."
             )
             if status in ("pending", "not_requested"):
+                # the CHECK method of the course's closing session, filled in by code from
+                # this run's tool results; it shows facts and adds no click to the approval
+                try:
+                    audit_events = agent.audit.read(last=5000)
+                except (OSError, ValueError):
+                    audit_events = None
+                check_rows = safe_check_items(run, audit_events)
+                st.markdown(
+                    '<div class="check"><div class="head">Before you approve: CHECK</div>'
+                    + "".join(
+                        f'<div class="row"><div class="letter">{html.escape(i_["letter"])}</div>'
+                        f'<div><span class="what">{html.escape(i_["title"])}.</span> '
+                        f"{html.escape(i_['text'])}</div></div>"
+                        for i_ in check_rows
+                    )
+                    + "</div>",
+                    unsafe_allow_html=True,
+                )
                 name = st.text_input("Approver name (required)")
                 ok_col, no_col = st.columns(2)
                 if ok_col.button("✅ Approve plan", disabled=not name.strip()):
@@ -873,7 +900,19 @@ with tabs[4]:
                     )
                     st.rerun()
             elif status == "approved":
-                share = st.slider("Random hold-out for measurement", 0.0, 0.5, 0.1, 0.01)
+                # start at the share designed in this run, so that the briefing and the
+                # export agree unless the approver moves the slider
+                from_run = designed_holdout_share(run, default=None)
+                designed = 0.10 if from_run is None else from_run
+                share = st.slider("Random hold-out for measurement", 0.0, 0.5, designed, 0.01)
+                st.caption(
+                    f"Starts at {designed:.0%}: "
+                    + (
+                        "the share designed in this run (see the verified statements)."
+                        if from_run is not None
+                        else "the default, because this run designed no hold-out."
+                    )
+                )
                 if st.button("⚡ Export audience file"):
                     try:
                         res = toolbox.call(

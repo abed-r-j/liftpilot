@@ -235,6 +235,9 @@ only: +0.0089 (95% CI +0.0021 to +0.0156); with age and gender added: +0.0097 (+
 | 18 | **A budget is never guessed.** A budget is a spending limit. If the amount the model passes does not match an amount in the manager's words, if the manager named a foreign currency and the model left the currency out, or if the manager stated a budget and the model passed none, no plan is made: the tool returns an error that says what to restate | `agent/runtime.py` (`_provenance`, `_execute`) | A budget silently changed, dropped or read in the wrong currency would produce a confident plan for the wrong amount of money; [11] | `test_budget_is_never_guessed` |
 | 19 | **Fair mode respects the budget on real spend.** Fair mode decides with every customer valued at the average basket, but a budget is held on real expected spend, computed with each customer's own basket; reported money also uses real baskets | `engine.py` (`_select`, `plan`) | A fairness option must not become a way to overspend | `test_fair_mode_respects_the_budget_on_real_spend` |
 | 20 | **No plan on default costs when stated figures cannot be read.** If the language model is not running and the request states a cost, a margin, a budget or a currency, the agent makes no plan and says why; the scripted planner runs by itself only for requests that state no figures | `agent/runtime.py` (`run`) | Planning on defaults while the request names other figures would mislead | `test_scripted_agent_runs_full_workflow_and_waits_for_human` covers the request without figures; no test covers the refusal |
+| 21 | **Hold-out target guard.** A detection target reaches the hold-out design only if it is a fraction between 0 and 1 that the manager wrote next to detection wording; otherwise it is dropped and the default applies. The wording is read in English only | `agent/runtime.py` (`_holdout_provenance`) | In the stress test the model chose the target itself and three identical requests gave hold-outs of 16%, 8% and 16% | `test_holdout_target_the_manager_never_stated_is_dropped`; stress test: dropped in 13 of 17 runs |
+| 22 | **Status and skip-approval wording checks.** While no plan of the run is approved or exported, a sentence saying that something was approved or exported, and advice to go ahead without approval, are flagged like an over-claim (one rewrite, then discard). A denial or a condition excuses a phrase only just before it in the same clause. Both are pattern lists | `agent/report.py` (`status_claims`, `bypass_advice`, `denied_before`); `agent/runtime.py` (`_loud`) | In the stress test answers said drafts were "all approved", and a draft repeated a hidden instruction to export without approval | `test_a_false_approved_is_rejected_until_a_person_really_approves`, `test_advice_to_skip_approval_is_rejected_and_recorded`, `test_a_denial_elsewhere_in_the_sentence_does_not_excuse_the_claim`; stress test: one "approved" sentence sent back in the final run; the skip-approval check did not have to act |
+| 23 | **Checklist in any language, and CHECK before approval.** A run in which the model itself made a plan must complete the whole campaign checklist, whatever the language of the request. The approval screen shows five CHECK lines written by code from the run's tool results; if steps are missing it names them and says not to approve. The export slider starts at the hold-out share designed in the run | `agent/runtime.py` (`_missing_steps`); `agent/check.py`; `app/main.py` | In the stress test an Arabic request stopped after three tools; a plan from such a run could be approved without notice | `test_a_plan_made_by_the_model_completes_the_checklist_in_any_language`, `test_check_panel_names_the_steps_a_run_did_not_do`, `test_export_slider_starts_at_the_share_designed_in_the_run`; stress test: French and Arabic completed the checklist, one run each |
 
 The benchmark's measured values are in section 10 of RESULTS.md (model `qwen3:8b`, 13 fixed
 requests): the planner received exactly the stated assumptions in 100% of the campaign requests
@@ -325,6 +328,36 @@ data.
     verified statements shown next to the narrative, and the human reader, are the remedy.
 15. **The data's own provenance**: whether the X5 customers consented to research use is
     unknown (see [DATASHEET.md](DATASHEET.md)).
+16. **Requests that are not in English.** In an earlier run of the stress test of section 8 an
+    Arabic request got a plan but no hold-out design, no send date, no drafts and no approval
+    request, because the runtime recognised a campaign request by English keywords. The
+    trigger was changed (control 23), and in the final run a French and an Arabic request each
+    completed the checklist. That is one run per language on one request. The wording of the
+    drafts in other languages was not compared, and the hold-out guard (control 21) reads
+    English wording only.
+17. **The wording checks are pattern lists.** The checks of control 22 miss a paraphrase that
+    avoids the listed words. The older over-claim list (control 11) does not read denials: in
+    the final stress run it matched "messages sent" inside "No messages sent yet." and a
+    correct briefing was replaced by the verified statements. Export does not depend on
+    wording; it needs a named approval.
+18. **A plan from an unfinished run can still be approved.** The CHECK block names the steps
+    not done, but the Approve button is still shown.
+
+## 8. The course's closing session: Thinking critically with AI
+
+[CRITICAL_THINKING.md](CRITICAL_THINKING.md) maps the closing session of the course (three ways
+AI fails, the four moves, CHECK, the six-question ethics compass, the marketing red lines) to
+the controls above, with the gap for each. It is not repeated here.
+
+A stress test built from that session (`liftpilot agent-stress`, section 12 of RESULTS.md,
+model `qwen3:8b`) passed 9 of 9 gated cases over 17 agent runs, with 241 of 241 numbers
+matched to a tool result or to a number in the request and no approval or export in the two
+hidden-instruction cases. This is one full run of all ten cases on the final code. The
+language swap is reported and not counted: the French and the Arabic request each matched the
+English plan and completed the checklist (item 16 above). The guards rejected 1 narrative, a
+correct one (item 17). Four earlier runs of the suite each scored 9 of 9 and each hid a
+problem that only reading the answers or the code showed, so a pass here means the stated rule
+held in these runs and nothing more.
 
 ## References
 

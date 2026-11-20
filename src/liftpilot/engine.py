@@ -597,6 +597,15 @@ class CampaignEngine:
     def request_approval(self, plan_id: str) -> dict[str, Any]:
         """Register that a plan is waiting for a human decision. Returns no secret."""
         sp = self._get(plan_id)
+        rec = self._approvals.get(plan_id) or {}
+        if rec.get("status") == "approved":
+            # a later request never takes back a decision a person already made
+            return {
+                "plan_id": plan_id,
+                "status": "already_approved",
+                "approved_by": rec.get("approver"),
+                "currency": self.currency,
+            }
         self._approvals[plan_id] = {"status": "pending", "code": secrets.token_hex(8)}
         return {
             "plan_id": plan_id,
