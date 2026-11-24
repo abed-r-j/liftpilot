@@ -52,5 +52,5 @@ tables.
    keeps its 95% interval.
 
 The hand-written documents in this folder were last checked against `RESULTS.md` on 2026-11-20
-(release 1.0.0). The sections that change most often are 7 (fairness), 9 (exchange rate, fetched
+(release 1.1.0). The sections that change most often are 7 (fairness), 9 (exchange rate, fetched
 live on every run) and 10 (agent benchmark).
