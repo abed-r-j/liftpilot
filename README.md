@@ -365,11 +365,11 @@ Two live feeds have a job in the planner and never change the uplift scores: exc
 Citation metadata are in [CITATION.cff](CITATION.cff):
 
 > A. E. R. Jaafir and G. Mahmoud, "LiftPilot: profit-calibrated uplift targeting with a guarded
-> campaign agent," software, version 1.0.0, Saint Joseph University of Beirut (USJ), 2026.
+> campaign agent," software, version 1.1.0, Saint Joseph University of Beirut (USJ), 2026.
 
-Version 1.0.0 is the release prepared for the presentation on 25 November 2026. The package
+Version 1.1.0 is the release prepared for the presentation on 25 November 2026. The package
 metadata (`pyproject.toml` and `liftpilot.__version__`), `CITATION.cff` and
-[CHANGELOG.md](CHANGELOG.md) all read 1.0.0.
+[CHANGELOG.md](CHANGELOG.md) all read 1.1.0.
 
 ## Authors and course
 
