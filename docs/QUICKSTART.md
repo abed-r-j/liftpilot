@@ -1,7 +1,6 @@
 # LiftPilot: how to start it and use it
 
-A short version for everyday use. The full stage procedure, with timings and fallbacks, is in
-[presentation/DEMO_RUNBOOK.md](presentation/DEMO_RUNBOOK.md).
+A short version for everyday use.
 
 ## Start it (every time)
 
