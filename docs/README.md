@@ -16,7 +16,6 @@ Start with the row that matches what you need.
 | File | What it is | Written by |
 |---|---|---|
 | `README.md` | this index | hand |
-| `BRIEF.md` | authoring brief: the story in the order the evidence supports it, and the rules for every document | hand |
 | `RESULTS.md` | the results sheet: every headline number in one place | `liftpilot results` |
 | `EXPLAINER.md` | plain-language explanation of the business problem, the method, each table, the agent and its controls (provenance guard, verified statements), the ethics and the course metrics; glossary; file map; ten things to remember | hand, numbers from `RESULTS.md` |
 | `MODEL_CARD.md` | model card for the uplift model and for the agent's language model | hand, numbers from `RESULTS.md` |
