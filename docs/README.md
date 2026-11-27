@@ -17,7 +17,6 @@ Start with the row that matches what you need.
 |---|---|---|
 | `README.md` | this index | hand |
 | `RESULTS.md` | the results sheet: every headline number in one place | `liftpilot results` |
-| `EXPLAINER.md` | plain-language explanation of the business problem, the method, each table, the agent and its controls (provenance guard, verified statements), the ethics and the course metrics; glossary; file map; ten things to remember | hand, numbers from `RESULTS.md` |
 | `MODEL_CARD.md` | model card for the uplift model and for the agent's language model | hand, numbers from `RESULTS.md` |
 | `DATASHEET.md` | datasheet for X5 RetailHero and Hillstrom as used here, with unknowns listed as unknown | hand |
 | `ETHICS.md` | "Is it wise?": position, sources, measured fairness findings, control-by-control mapping, misuse, open questions | hand, numbers from `RESULTS.md` |
