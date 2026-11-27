@@ -8,7 +8,6 @@ Start with the row that matches what you need.
 | know what the models are for, how good they are and where they fail | [MODEL_CARD.md](MODEL_CARD.md) |
 | know where the data come from, what is known and what is not | [DATASHEET.md](DATASHEET.md) |
 | see the ethical position, the fairness findings and the controls | [ETHICS.md](ETHICS.md) |
-| know the rules every project document follows | [BRIEF.md](BRIEF.md) |
 | install and run the project | [../README.md](../README.md) |
 | contribute, or see what changed | [../CONTRIBUTING.md](../CONTRIBUTING.md), [../CHANGELOG.md](../CHANGELOG.md) |
 
