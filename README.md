@@ -351,7 +351,6 @@ Two live feeds have a job in the planner and never change the uplift scores: exc
 
 ## Documentation
 
-- [docs/EXPLAINER.md](docs/EXPLAINER.md): the whole project from zero, in plain language
 - [docs/QUICKSTART.md](docs/QUICKSTART.md): how to start the dashboard and use each tab
 - [docs/RESULTS.md](docs/RESULTS.md): every number (generated)
 - [docs/CRITICAL_THINKING.md](docs/CRITICAL_THINKING.md): how the project applies the course's
